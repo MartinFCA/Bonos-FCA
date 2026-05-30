@@ -121,7 +121,8 @@ try:
     tab1, tab2 = st.tabs(["📊 Gráfico Interactivo", "📋 Tabla de Datos"])
     
     with tab1:
-        st.plotly_chart(fig, use_container_width=True)
+        # MODIFICA ESTA LÍNEA AGREGANDO theme=None:
+        st.plotly_chart(fig, theme=None, use_container_width=True)
         
     with tab2:
         # Mostrar tabla de datos formateada
