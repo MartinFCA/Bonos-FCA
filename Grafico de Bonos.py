@@ -67,7 +67,7 @@ try:
                     x=years_smooth, y=p(years_smooth),
                     mode='lines', 
                     name=f'Trend {tipo}',
-                    line=dict(color=color, width=4),  # Grosor 4 continuo original de Colab
+                    line=dict(color=color, width=2),  # Grosor 2 continuo original de Colab
                     hoverinfo='skip'
                 ))
 
@@ -80,7 +80,7 @@ try:
                 mode='markers', 
                 name='Investment Grade (IG)' if tipo == 'IG' else 'High Yield (HY)',
                 marker=dict(
-                    size=11, 
+                    size=8, 
                     color=color, 
                     opacity=0.75,  # Opacidad exacta de Colab
                     line=dict(width=2, color='white')  # Borde blanco marcado
@@ -99,14 +99,22 @@ try:
     fig.update_layout(
         title='<b>Curva de Rendimiento de Bonos - Análisis YTW</b>',
         xaxis_title='<b>Año de Vencimiento</b>', 
-        yaxis_title='<b>YTW - Yield to Worst (%)</b>',  # Nombre largo del eje Y
-        plot_bgcolor='#FAFAFA',   # Fondo gris claro del gráfico
-        paper_bgcolor='white',   # Fondo blanco exterior
+        yaxis_title='<b>YTW - Yield to Worst (%)</b>', 
+        plot_bgcolor='#FAFAFA',   
+        paper_bgcolor='white',   
         hovermode='closest',
-        height=720,              # Altura optimizada para pantallas web
+        height=720,              
         font=dict(family='Arial', size=12),
-        # Cuadro de la leyenda arriba a la izquierda con fondo semi-transparente
-        legend=dict(x=0.015, y=0.985, bgcolor='rgba(255, 255, 255, 0.95)', bordercolor='Gainsboro', borderwidth=1)
+        
+        # LEYENDA EN NEGRO INTERACTIVA
+        legend=dict(
+            x=0.015, 
+            y=0.985, 
+            bgcolor='rgba(0, 0, 0, 0.85)',    # Fondo negro elegante (85% de opacidad para que no tape 100% los puntos de atrás)
+            bordercolor='black',              # Borde negro para cerrar el cuadro
+            borderwidth=1,
+            font=dict(color='white', size=11) # ¡Clave! Letra blanca para que contraste perfectamente sobre el fondo negro
+        )
     )
     
     # --- RENDERIZADO EN PESTAÑAS ---
