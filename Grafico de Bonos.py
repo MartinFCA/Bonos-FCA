@@ -103,11 +103,8 @@ try:
         plot_bgcolor='#FAFAFA',   # Fondo gris muy claro de la cuadrícula (puedes cambiarlo a 'white' si lo quieres blanco puro)
         paper_bgcolor='white',   # Fondo exterior del gráfico blanco
         hovermode='closest',
-        height=720,              
-        
-        # TEXTO GENERAL EN NEGRO
-        font=dict(
-            family='Arial', 
+        height=720,
+        font=dict( family='Arial', 
             size=12, 
             color='black'  # <--- Esto fuerza a que todo el texto del gráfico sea negro puro
         )
