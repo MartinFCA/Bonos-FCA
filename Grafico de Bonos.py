@@ -28,8 +28,7 @@ try:
         df['Maturity'] = pd.to_datetime(df['Maturity'], errors='coerce').dt.strftime('%d/%m/%Y')
         
 # 📊 Normalizar todas las columnas de porcentaje a escala 0-100
-    columnas_porcentaje = ['YTW %', 'Coupon %', 'Prev month
-YTW%']
+    columnas_porcentaje = ['YTW %', 'Coupon %', 'Prev monthYTW%']
     for col in columnas_porcentaje:
         if col in df.columns and df[col].max() <= 1.0:
             df[col] = df[col] * 100
@@ -153,8 +152,7 @@ YTW%']
         config_visual = {}
         
         # Columnas a las que queremos ponerle % al final y 2 decimales
-        columnas_a_formatear = ['YTW %', 'Coupon %', 'Prev month
-YTW%']
+        columnas_a_formatear = ['YTW %', 'Coupon %', 'Prev monthYTW%']
         
         for col in columnas_a_formatear:
             if col in df_filtrado.columns:
