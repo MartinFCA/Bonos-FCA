@@ -94,7 +94,7 @@ try:
                       for _, row in df_puntos.iterrows()],
                 hovertemplate='%{text}<extra></extra>'
             ))
-    # 3. Configuración del Layout idéntico al de Colab (Ejes, fondo y leyenda)
+    # 3. Configuración del Layout (Ejes, fondo y leyenda)
     fig.update_layout(
         title='<b>Curva de Rendimiento de Bonos - Análisis YTW</b>',
         xaxis_title='<b>Año de Vencimiento</b>', 
@@ -103,18 +103,18 @@ try:
         paper_bgcolor='white',   
         hovermode='closest',
         height=720,              
-        font=dict(color='black',family='Arial', size=12),
+        font=dict(color='black', family='Arial', size=12), # <--- Letra negra para todo el gráfico
         
-        # LEYENDA EN NEGRO INTERACTIVA
+        # Leyenda en negro con letra blanca (para que contraste internamente)
         legend=dict(
             x=0.015, 
             y=0.985, 
-            bgcolor='rgba(0, 0, 0, 0.85)',    # Fondo negro elegante (85% de opacidad para que no tape 100% los puntos de atrás)
-            bordercolor='black',              # Borde negro para cerrar el cuadro
+            bgcolor='rgba(0, 0, 0, 0.85)',    
+            bordercolor='black',              
             borderwidth=1,
-            font=dict(color='white', size=11) # ¡Clave! Letra blanca para que contraste perfectamente sobre el fondo negro
+            font=dict(color='white', size=11) 
         )
-    )        
+    ) # <--- ASEGÚRATE DE QUE ESTE PARÉNTESIS ESTÉ CERRADO
   
     
     # --- RENDERIZADO EN PESTAÑAS ---
