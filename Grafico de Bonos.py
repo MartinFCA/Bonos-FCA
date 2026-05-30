@@ -6,8 +6,18 @@ import plotly.graph_objects as go
 # Configuración de la página web (Ancho completo estilo ejecutivo)
 st.set_page_config(page_title="Dashboard de Bonos", layout="wide")
 
+# 🔒 MEDIDA DE SEGURIDAD: Ocultar menús de desarrollo y marcas de Streamlit
+ocultar_estilos_streamlit = """
+            <style>
+            #MainMenu {visibility: hidden;}
+            footer {visibility: hidden;}
+            header {visibility: hidden;}
+            </style>
+            """
+st.markdown(ocultar_estilos_streamlit, unsafe_with_html=True)
+
 st.title("📊 Curva de Rendimiento de Bonos")
-st.subtittle("Actualizado al 15 de Mayo")
+st.subtitle("Actualizado al 15 de Mayo")
 
 # ============================================================================
 # ⚙️ CONFIGURACIÓN DEL ARCHIVO: Pon aquí el nombre exacto de tu Excel en GitHub
