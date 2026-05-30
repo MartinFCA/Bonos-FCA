@@ -127,6 +127,7 @@ try:
             linewidth=2,         # Grosor de la línea del eje
             ticks='outside',     # Saca las pequeñas marcas de los años hacia afuera
             tickcolor='black',   # Color negro para las marcas de los años
+            ticksuffix='%',      # 🌟 LA CLAVE: Agrega el símbolo de porcentaje a cada número del eje
             mirror=False         # Evita que se duplique la línea arriba del gráfico
         ),
         
