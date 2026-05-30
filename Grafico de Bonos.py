@@ -7,6 +7,7 @@ import plotly.graph_objects as go
 st.set_page_config(page_title="Dashboard de Bonos", layout="wide")
 
 st.title("📊 Curva de Rendimiento de Bonos")
+st.subtittle("Actualizado al 15 de Mayo")
 
 # ============================================================================
 # ⚙️ CONFIGURACIÓN DEL ARCHIVO: Pon aquí el nombre exacto de tu Excel en GitHub
