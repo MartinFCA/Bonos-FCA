@@ -104,6 +104,25 @@ try:
         hovermode='closest',
         height=720,              
         font=dict(color='black', family='Arial', size=12), # <--- Letra negra para todo el gráfico
+        # 🛠️ CONFIGURACIÓN DEL EJE X EN NEGRO
+        xaxis=dict(
+            showline=True,       # Activa la línea base del eje X
+            linecolor='black',   # Color negro para la línea
+            linewidth=2,         # Grosor de la línea del eje
+            ticks='outside',     # Saca las pequeñas marcas de los años hacia afuera
+            tickcolor='black',   # Color negro para las marcas de los años
+            mirror=False         # Evita que se duplique la línea arriba del gráfico
+        ),
+        
+        # 🛠️ CONFIGURACIÓN DEL EJE Y EN NEGRO
+        yaxis=dict(
+            showline=True,       # Activa la línea base del eje Y
+            linecolor='black',   # Color negro para la línea
+            linewidth=2,         # Grosor de la línea del eje
+            ticks='outside',     # Saca las pequeñas marcas de los porcentajes hacia afuera
+            tickcolor='black',   # Color negro para las marcas de los porcentajes
+            mirror=False         # Evita que se duplique la línea a la derecha del gráfico
+        ),
         
         # Leyenda en negro con letra blanca (para que contraste internamente)
         legend=dict(
