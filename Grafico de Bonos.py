@@ -95,16 +95,18 @@ try:
                 hovertemplate='%{text}<extra></extra>'
             ))
             
-    # 3. Configuración del Layout idéntico al de Colab (Ejes, fondo y leyenda)
-    fig.update_layout(
+   fig.update_layout(
         title='<b>Curva de Rendimiento de Bonos - Análisis YTW</b>',
         xaxis_title='<b>Año de Vencimiento</b>', 
         yaxis_title='<b>YTW - Yield to Worst (%)</b>', 
         plot_bgcolor='#FAFAFA',   # Fondo gris muy claro de la cuadrícula (puedes cambiarlo a 'white' si lo quieres blanco puro)
         paper_bgcolor='white',   # Fondo exterior del gráfico blanco
         hovermode='closest',
-        height=720,
-        font=dict( family='Arial', 
+        height=720,              
+        
+        # TEXTO GENERAL EN NEGRO
+        font=dict(
+            family='Arial', 
             size=12, 
             color='black'  # <--- Esto fuerza a que todo el texto del gráfico sea negro puro
         )
