@@ -11,7 +11,7 @@ st.title("📊 Análisis y Curva de Rendimiento de Bonos")
 # ============================================================================
 # ⚙️ CONFIGURACIÓN DEL ARCHIVO: Pon aquí el nombre exacto de tu Excel en GitHub
 # ============================================================================
-NOMBRE_ARCHIVO_EXCEL = "datos_bonos.xlsx" 
+NOMBRE_ARCHIVO_EXCEL = "Bonos Ejemplo.xlsx" 
 
 # Función para cargar datos (usamos caché para que la web vuele en velocidad)
 @st.cache_data
