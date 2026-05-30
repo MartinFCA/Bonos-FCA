@@ -7,48 +7,54 @@ import plotly.graph_objects as go
 st.set_page_config(page_title="Dashboard de Bonos", layout="wide")
 
 st.title("📊 Análisis y Curva de Rendimiento de Bonos")
-st.write("Sube tu archivo Excel para recalcular las curvas de tendencia en tiempo real.")
 
-# 1. Cargador de archivos interactivo estilo Web
-uploaded_file = st.file_uploader("Elige tu archivo Excel de Bonos", type=["xlsx"])
+# ============================================================================
+# ⚙️ CONFIGURACIÓN DEL ARCHIVO: Pon aquí el nombre exacto de tu Excel en GitHub
+# ============================================================================
+NOMBRE_ARCHIVO_EXCEL = "datos_bonos.xlsx" 
 
-if uploaded_file is not None:
-    # Leer datos del archivo subido
-    df = pd.read_excel(uploaded_file)
+# Función para cargar datos (usamos caché para que la web vuele en velocidad)
+@st.cache_data
+def cargar_datos(ruta):
+    return pd.read_excel(ruta)
+
+try:
+    # Leer datos automáticamente desde el repositorio de GitHub
+    df = cargar_datos(NOMBRE_ARCHIVO_EXCEL)
     
-    # --- LIMPIEZA DE DATOS (Mismo código de tu notebook) ---
+    # --- LIMPIEZA DE DATOS AUTOMÁTICA ---
     df = df.dropna(subset=['Year', 'YTW %'])
     if df['YTW %'].max() <= 1.0:
         df['YTW %'] = df['YTW %'] * 100
     if 'Coupon %' in df.columns and df['Coupon %'].max() <= 1.0:
         df['Coupon %'] = df['Coupon %'] * 100
 
-    # 2. FILTRO MULTI-SELECCIÓN ESTILO EXCEL
-    # Buscamos la columna de emisores
+    # Determinar columna de emisores de forma dinámica
     col_emisor = 'Guarantor/Organization' if 'Guarantor/Organization' in df.columns else 'Issuer'
     
+    # --- BARRA LATERAL DE FILTROS (ESTILO EXCEL) ---
     st.sidebar.header("Filtros del Portafolio")
     emisores_disponibles = sorted(df[col_emisor].unique())
     
-    # El filtro inicia con TODOS los emisores seleccionados por defecto
+    # El filtro inicia con TODOS los emisores seleccionados por defecto automáticamente
     emisores_seleccionados = st.sidebar.multiselect(
         "Selecciona los emisores a INCLUIR:",
         options=emisores_disponibles,
         default=emisores_disponibles
     )
     
-    # FILTRADO DINÁMICO DEL DATAFRAME
+    # Filtrado dinámico en tiempo real
     df_filtrado = df[df[col_emisor].isin(emisores_seleccionados)]
     
-    # 3. CREACIÓN DEL GRÁFICO (Se recalcula automáticamente al cambiar el filtro)
+    # --- CREACIÓN DEL GRÁFICO INTERACTIVO ---
     fig = go.Figure()
     color_ig = '#FF9944'
     color_hy = '#1F77B4'
     
-    # Recalcular curvas de tendencia basadas ÚNICAMENTE en los datos filtrados
+    # Recalcular curvas de tendencia en base a lo filtrado
     for tipo, color in [('IG', color_ig), ('HY', color_hy)]:
         df_tipo = df_filtrado[df_filtrado['IG - HY'] == tipo]
-        if len(df_tipo) >= 3:  # Necesitamos al menos 3 puntos para una curva cuadrática
+        if len(df_tipo) >= 3:
             grouped = df_tipo.groupby('Year').agg({'YTW %': 'mean'}).reset_index().sort_values('Year')
             if len(grouped) >= 2:
                 z = np.polyfit(grouped['Year'], grouped['YTW %'], 2)
@@ -62,7 +68,7 @@ if uploaded_file is not None:
                     hoverinfo='skip'
                 ))
 
-    # Pintar los puntos del gráfico
+    # Dibujar los puntos de los bonos
     for tipo, color in [('IG', color_ig), ('HY', color_hy)]:
         df_puntos = df_filtrado[df_filtrado['IG - HY'] == tipo]
         if not df_puntos.empty:
@@ -70,25 +76,30 @@ if uploaded_file is not None:
                 x=df_puntos['Year'], y=df_puntos['YTW %'],
                 mode='markers', name=tipo,
                 marker=dict(size=11, color=color, opacity=0.85, line=dict(width=1.5, color='white')),
-                text=[f"<b>{row[col_emisor]}</b><br>Rating: {row['Rating']}<br>YTW: {row['YTW %']:.2f}%" for _, row in df_puntos.iterrows()],
+                text=[f"<b>{row[col_emisor]}</b><br>Rating: {row['Rating']}<br>YTW: {row['YTW %']:.2f}%<br>Maturity: {row['Maturity']}" for _, row in df_puntos.iterrows()],
                 hovertemplate='%{text}<extra></extra>'
             ))
             
     fig.update_layout(
-        xaxis_title='Año de Vencimiento', yaxis_title='YTW (%)',
-        plot_bgcolor='#FAFAFA', paper_bgcolor='white', height=600
+        xaxis_title='<b>Año de Vencimiento</b>', 
+        yaxis_title='<b>YTW (%)</b>',
+        plot_bgcolor='#FAFAFA', 
+        paper_bgcolor='white', 
+        height=650,
+        margin=dict(l=40, r=40, t=20, b=40)
     )
     
-    # PESTAÑAS NATIVAS DE STREAMLIT
+    # --- RENDERIZADO DE PESTAÑAS ---
     tab1, tab2 = st.tabs(["📊 Gráfico Interactivo", "📋 Tabla de Datos"])
     
     with tab1:
         st.plotly_chart(fig, use_container_width=True)
         
     with tab2:
-        # Formatear la tabla visualmente
+        # Copia para dar formato limpio en la tabla visual
         df_tabla = df_filtrado.copy()
         st.dataframe(df_tabla, use_container_width=True)
 
-else:
-    st.info("💡 Por favor, sube un archivo Excel en el panel central para visualizar el Dashboard.")
+except FileNotFoundError:
+    st.error(f"❌ No se pudo encontrar el archivo '{NOMBRE_ARCHIVO_EXCEL}' en tu repositorio de GitHub.")
+    st.info("Por favor, asegúrate de subir el archivo Excel a la misma carpeta de GitHub y que el nombre coincida exactamente (respetando mayúsculas, minúsculas y extensión .xlsx).")
