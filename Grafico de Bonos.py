@@ -6,7 +6,7 @@ import plotly.graph_objects as go
 # Configuración de la página web (Ancho completo estilo ejecutivo)
 st.set_page_config(page_title="Dashboard de Bonos", layout="wide")
 
-st.title("📊 Análisis y Curva de Rendimiento de Bonos")
+st.title("📊 Curva de Rendimiento de Bonos")
 
 # ============================================================================
 # ⚙️ CONFIGURACIÓN DEL ARCHIVO: Pon aquí el nombre exacto de tu Excel en GitHub
@@ -21,7 +21,12 @@ def cargar_datos(ruta):
 try:
     # Leer datos automáticamente desde el repositorio de GitHub
     df = cargar_datos(NOMBRE_ARCHIVO_EXCEL)
-    
+
+    # 📆 SOLUCIÓN: Formatear la columna de fecha para quitar las horas
+    if 'Maturity' in df.columns:
+        # Convierte a fecha y la formatea como Día/Mes/Año (ej: 15/05/2028)
+        df['Maturity'] = pd.to_datetime(df['Maturity'], errors='coerce').dt.strftime('%d/%m/%Y')
+        
     # --- LIMPIEZA DE DATOS AUTOMÁTICA (IGUAL A COLAB) ---
     df = df.dropna(subset=['Year', 'YTW %'])
     if df['YTW %'].max() <= 1.0:
