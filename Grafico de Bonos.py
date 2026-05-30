@@ -17,7 +17,7 @@ ocultar_estilos_streamlit = """
 st.markdown(ocultar_estilos_streamlit, unsafe_with_html=True)
 
 st.title("📊 Curva de Rendimiento de Bonos")
-st.subtitle("Actualizado al 15 de Mayo")
+st.caption("📅 Actualizado al 15 de Mayo")
 
 # ============================================================================
 # ⚙️ CONFIGURACIÓN DEL ARCHIVO: Pon aquí el nombre exacto de tu Excel en GitHub
