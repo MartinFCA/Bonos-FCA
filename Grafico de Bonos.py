@@ -14,7 +14,8 @@ ocultar_estilos_streamlit = """
             header {visibility: hidden;}
             </style>
             """
-st.markdown(ocultar_estilos_streamlit, unsafe_with_html=True)
+# CORRECCIÓN: Cambiado 'unsafe_with_html' por 'unsafe_allow_html'
+st.markdown(ocultar_estilos_streamlit, unsafe_allow_html=True)
 
 st.title("📊 Curva de Rendimiento de Bonos")
 st.caption("📅 Actualizado al 15 de Mayo")
