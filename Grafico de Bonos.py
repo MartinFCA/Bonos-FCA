@@ -27,12 +27,11 @@ try:
         # Convierte a fecha y la formatea como Día/Mes/Año (ej: 15/05/2028)
         df['Maturity'] = pd.to_datetime(df['Maturity'], errors='coerce').dt.strftime('%d/%m/%Y')
         
-    # --- LIMPIEZA DE DATOS AUTOMÁTICA (IGUAL A COLAB) ---
-    df = df.dropna(subset=['Year', 'YTW %'])
-    if df['YTW %'].max() <= 1.0:
-        df['YTW %'] = df['YTW %'] * 100
-    if 'Coupon %' in df.columns and df['Coupon %'].max() <= 1.0:
-        df['Coupon %'] = df['Coupon %'] * 100
+# 📊 Normalizar todas las columnas de porcentaje a escala 0-100
+    columnas_porcentaje = ['YTW %', 'YTW', 'Coupon %', 'YTW Prev month']
+    for col in columnas_porcentaje:
+        if col in df.columns and df[col].max() <= 1.0:
+            df[col] = df[col] * 100
 
     # Determinar la columna de emisores de forma dinámica
     col_emisor = 'Guarantor/Organization' if 'Guarantor/Organization' in df.columns else 'Issuer'
