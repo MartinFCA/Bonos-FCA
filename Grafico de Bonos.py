@@ -103,7 +103,7 @@ try:
         paper_bgcolor='white',   
         hovermode='closest',
         height=720,              
-        font=dict(family='Arial', size=12, color='black'),
+        font=dict(color='black',family='Arial', size=12),
         
         # LEYENDA EN NEGRO INTERACTIVA
         legend=dict(
