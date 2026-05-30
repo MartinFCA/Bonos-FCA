@@ -148,8 +148,25 @@ try:
         st.plotly_chart(fig, theme=None, use_container_width=True)
         
     with tab2:
-        # Mostrar tabla de datos formateada
-        st.dataframe(df_filtrado, use_container_width=True)
+        # Crear la configuración de formato para las columnas de la tabla
+        config_visual = {}
+        
+        # Columnas a las que queremos ponerle % al final y 2 decimales
+        columnas_a_formatear = ['YTW %', 'YTW', 'Coupon %', 'Coupon', 'YTW Prev month']
+        
+        for col in columnas_a_formatear:
+            if col in df_filtrado.columns:
+                config_visual[col] = st.column_config.NumberColumn(
+                    format="%.2f", # Fuerza 2 decimales fijos (ej: 5.20)
+                    suffix="%"     # Agrega el símbolo de porcentaje al final
+                )
+        
+        # Renderizar la tabla con la configuración visual aplicada
+        st.dataframe(
+            df_filtrado, 
+            use_container_width=True,
+            column_config=config_visual
+        )
 
 except FileNotFoundError:
     st.error(f"❌ No se pudo encontrar el archivo '{NOMBRE_ARCHIVO_EXCEL}' en tu repositorio de GitHub.")
