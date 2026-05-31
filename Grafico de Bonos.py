@@ -175,13 +175,13 @@ try:
                 )
         
             columnas_a_formatear2 = ['Minimum Settlement', 'Outstanding US$']
-                for col in columnas_a_formatear2:
-            if col in df_filtrado.columns:
-                # 🛠️ CORRECCIÓN: Quitamos 'suffix' y usamos '%%' dentro del format
-                config_visual[col] = st.column_config.NumberColumn(
-                    format="$%.2f"  # El '%%' le dice a Python que pinte un '%' real al final del número
-                )
-        
+             for col in columnas_a_formatear2:
+                        if col in df_filtrado.columns:
+                            # 🛠️ CORRECCIÓN: Quitamos 'suffix' y usamos '%%' dentro del format
+                            config_visual[col] = st.column_config.NumberColumn(
+                                format="$%.2f"  # El '%%' le dice a Python que pinte un '%' real al final del número
+                            )
+                    
         # Renderizar la tabla con la configuración visual aplicada
         st.dataframe(
             df_filtrado, 
