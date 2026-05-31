@@ -164,23 +164,24 @@ try:
         # Crear la configuración de formato para las columnas de la tabla
         config_visual = {}
         
-        # Columnas a las que queremos ponerle % al final y 2 decimales
+        # 1️⃣ Formato para columnas de Porcentaje
         columnas_a_formatear = ['YTW %', 'Coupon %', 'Prev monthYTW%']
         
         for col in columnas_a_formatear:
             if col in df_filtrado.columns:
-                # 🛠️ CORRECCIÓN: Quitamos 'suffix' y usamos '%%' dentro del format
                 config_visual[col] = st.column_config.NumberColumn(
-                    format="%.2f%%"  # El '%%' le dice a Python que pinte un '%' real al final del número
+                    format="%.2f%%"  # Agrega el % al final con 2 decimales
                 )
         
-            columnas_a_formatear2 = ['Minimum Settlement', 'Outstanding US$']
-             for col in columnas_a_formatear2:
-                        if col in df_filtrado.columns:
-                            # 🛠️ CORRECCIÓN: Quitamos 'suffix' y usamos '%%' dentro del format
-                            config_visual[col] = st.column_config.NumberColumn(
-                                format="$%.2f"  # El '%%' le dice a Python que pinte un '%' real al final del número
-                            )
+        # 2️⃣ Formato para columnas de Dinero / Dólares
+        # (Sacado fuera del bucle anterior y alineado correctamente)
+        columnas_a_formatear2 = ['Minimum Settlement', 'Outstanding US$']
+        
+        for col in columnas_a_formatear2:
+            if col in df_filtrado.columns:
+                config_visual[col] = st.column_config.NumberColumn(
+                    format="$%.2f"  # Agrega el signo $ al principio con 2 decimales
+                )
                     
         # Renderizar la tabla con la configuración visual aplicada
         st.dataframe(
