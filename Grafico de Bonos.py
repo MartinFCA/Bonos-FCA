@@ -73,11 +73,11 @@ try:
     for tipo, color in [('IG', color_ig), ('HY', color_hy)]:
         df_tipo = df_filtrado[df_filtrado['IG - HY'] == tipo]
         if len(df_tipo) >= 3:
-            grouped = df_tipo.groupby('Year').agg({'YTW %': 'mean'}).reset_index().sort_values('Year')
+            grouped = df_tipo.groupby('Maturity').agg({'YTW %': 'mean'}).reset_index().sort_values('Maturity')
             if len(grouped) >= 2:
                 z = np.polyfit(grouped['Year'], grouped['YTW %'], 2)
                 p = np.poly1d(z)
-                years_smooth = np.linspace(grouped['Year'].min(), grouped['Year'].max(), 150)
+                years_smooth = np.linspace(grouped['Maturity'].min(), grouped['Maturity'].max(), 150)
                 
                 fig.add_trace(go.Scatter(
                     x=years_smooth, y=p(years_smooth),
@@ -92,7 +92,7 @@ try:
         df_puntos = df_filtrado[df_filtrado['IG - HY'] == tipo]
         if not df_puntos.empty:
             fig.add_trace(go.Scatter(
-                x=df_puntos['Year'], y=df_puntos['YTW %'],
+                x=df_puntos['Maturity'], y=df_puntos['YTW %'],
                 mode='markers', 
                 name='Investment Grade (IG)' if tipo == 'IG' else 'High Yield (HY)',
                 marker=dict(
