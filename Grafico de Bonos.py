@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
+import datetime  # 📆 Necesario para la conversión matemática de fechas
 
 # Configuración de la página web (Ancho completo estilo ejecutivo)
 st.set_page_config(page_title="Dashboard de Bonos", layout="wide")
@@ -14,7 +15,6 @@ ocultar_estilos_streamlit = """
             header {visibility: hidden;}
             </style>
             """
-# CORRECCIÓN: Cambiado 'unsafe_with_html' por 'unsafe_allow_html'
 st.markdown(ocultar_estilos_streamlit, unsafe_allow_html=True)
 
 st.title("📊 Curva de Rendimiento de Bonos")
@@ -34,12 +34,14 @@ try:
     # Leer datos automáticamente desde el repositorio de GitHub
     df = cargar_datos(NOMBRE_ARCHIVO_EXCEL)
 
-    # 📆 SOLUCIÓN: Formatear la columna de fecha para quitar las horas
+    # 📆 SOLUCIÓN: Convertir a Fecha Real (Datetime) para mantener orden cronológico exacto
     if 'Maturity' in df.columns:
-        # Convierte a fecha y la formatea como Día/Mes/Año (ej: 15/05/2028)
-        df['Maturity'] = pd.to_datetime(df['Maturity'], errors='coerce').dt.strftime('%d/%m/%Y')
+        df['Maturity'] = pd.to_datetime(df['Maturity'], errors='coerce')
         
-# 📊 Normalizar todas las columnas de porcentaje a escala 0-100
+    # Limpieza de filas vacías basada en la fecha y el rendimiento
+    df = df.dropna(subset=['Maturity', 'YTW %'])
+        
+    # 📊 Normalizar todas las columnas de porcentaje a escala 0-100
     columnas_porcentaje = ['YTW %', 'Coupon %', 'Prev monthYTW%']
     for col in columnas_porcentaje:
         if col in df.columns and df[col].max() <= 1.0:
@@ -69,25 +71,32 @@ try:
     color_ig = '#FF9944'  # Naranja claro
     color_hy = '#1F77B4'  # Azul oscuro
     
-    # 1. Dibujar primero las Líneas de Tendencia (continuas y gruesas)
+    # 1. Dibujar primero las Líneas de Tendencia (Matemática basada en días ordinales)
     for tipo, color in [('IG', color_ig), ('HY', color_hy)]:
         df_tipo = df_filtrado[df_filtrado['IG - HY'] == tipo]
         if len(df_tipo) >= 3:
             grouped = df_tipo.groupby('Maturity').agg({'YTW %': 'mean'}).reset_index().sort_values('Maturity')
             if len(grouped) >= 2:
-                z = np.polyfit(grouped['Year'], grouped['YTW %'], 2)
+                # Convertimos las fechas a números (días ordinales) para que np.polyfit funcione
+                x_numerico = grouped['Maturity'].apply(lambda x: x.toordinal())
+                
+                z = np.polyfit(x_numerico, grouped['YTW %'], 2)
                 p = np.poly1d(z)
-                years_smooth = np.linspace(grouped['Maturity'].min(), grouped['Maturity'].max(), 150)
+                
+                # Generamos un rango continuo de días entre la fecha mínima y máxima
+                x_smooth_num = np.linspace(x_numerico.min(), x_numerico.max(), 150)
+                # Convertimos esos números de vuelta a fechas reales para Plotly
+                x_smooth_dates = [datetime.date.fromordinal(int(x)) for x in x_smooth_num]
                 
                 fig.add_trace(go.Scatter(
-                    x=years_smooth, y=p(years_smooth),
+                    x=x_smooth_dates, y=p(x_smooth_num),
                     mode='lines', 
                     name=f'Trend {tipo}',
-                    line=dict(color=color, width=2),  # Grosor 2 continuo original de Colab
+                    line=dict(color=color, width=2),
                     hoverinfo='skip'
                 ))
 
-    # 2. Dibujar los Puntos de los Bonos (Marcadores con borde y opacidad de Colab)
+    # 2. Dibujar los Puntos de los Bonos (Distribuidos por su fecha exacta)
     for tipo, color in [('IG', color_ig), ('HY', color_hy)]:
         df_puntos = df_filtrado[df_filtrado['IG - HY'] == tipo]
         if not df_puntos.empty:
@@ -98,50 +107,53 @@ try:
                 marker=dict(
                     size=8, 
                     color=color, 
-                    opacity=0.75,  # Opacidad exacta de Colab
-                    line=dict(width=2, color='white')  # Borde blanco marcado
+                    opacity=0.75, 
+                    line=dict(width=2, color='white') 
                 ),
-                # Tooltip flotante con la estructura exacta que tenías (con Cupón incluido)
+                # Tooltip flotante: Formateamos la fecha directamente aquí (.strftime) para el cuadro visual
                 text=[f"<b>{row[col_emisor]}</b><br>" +
                       f"Rating: {row['Rating']}<br>" +
                       f"YTW: {row['YTW %']:.2f}%<br>" +
                       f"Coupon: {row['Coupon %']:.2f}%<br>" +
-                      f"Maturity: {row['Maturity']}" 
+                      f"Maturity: {row['Maturity'].strftime('%d/%m/%Y')}" 
                       for _, row in df_puntos.iterrows()],
                 hovertemplate='%{text}<extra></extra>'
             ))
+
     # 3. Configuración del Layout (Ejes, fondo y leyenda)
     fig.update_layout(
         title='<b>Curva de Rendimiento de Bonos - Análisis YTW</b>',
-        xaxis_title='<b>Año de Vencimiento</b>', 
+        xaxis_title='<b>Fecha de Vencimiento</b>', 
         yaxis_title='<b>YTW - Yield to Worst (%)</b>', 
         plot_bgcolor='#FAFAFA',   
         paper_bgcolor='white',   
         hovermode='closest',
         height=720,              
-        font=dict(color='black', family='Arial', size=12), # <--- Letra negra para todo el gráfico
-        # 🛠️ CONFIGURACIÓN DEL EJE X EN NEGRO
+        font=dict(color='black', family='Arial', size=12), 
+        
+        # 🛠️ CONFIGURACIÓN DEL EJE X (Eje de tiempo continuo)
         xaxis=dict(
-            showline=True,       # Activa la línea base del eje X
-            linecolor='black',   # Color negro para la línea
-            linewidth=2,         # Grosor de la línea del eje
-            ticks='outside',     # Saca las pequeñas marcas de los años hacia afuera
-            tickcolor='black',   # Color negro para las marcas de los años
-            mirror=False         # Evita que se duplique la línea arriba del gráfico
+            type='date',         # Declara explícitamente que el eje X maneja fechas
+            showline=True,       
+            linecolor='black',   
+            linewidth=2,         
+            ticks='outside',     
+            tickcolor='black',   
+            mirror=False         
         ),
         
         # 🛠️ CONFIGURACIÓN DEL EJE Y EN NEGRO
         yaxis=dict(
-            showline=True,       # Activa la línea base del eje Y
-            linecolor='black',   # Color negro para la línea
-            linewidth=2,         # Grosor de la línea del eje
-            ticks='outside',     # Saca las pequeñas marcas de los porcentajes hacia afuera
-            tickcolor='black',   # Color negro para las marcas de los porcentajes
-            ticksuffix='%',      # 🌟 LA CLAVE: Agrega el símbolo de porcentaje a cada número del eje
-            mirror=False         # Evita que se duplique la línea a la derecha del gráfico
+            showline=True,       
+            linecolor='black',   
+            linewidth=2,         
+            ticks='outside',     
+            tickcolor='black',   
+            ticksuffix='%',      
+            mirror=False         
         ),
         
-        # Leyenda en negro con letra blanca (para que contraste internamente)
+        # Leyenda en negro con letra blanca
         legend=dict(
             x=0.015, 
             y=0.985, 
@@ -150,37 +162,37 @@ try:
             borderwidth=1,
             font=dict(color='white', size=11) 
         )
-    ) # <--- ASEGÚRATE DE QUE ESTE PARÉNTESIS ESTÉ CERRADO
+    ) 
   
-    
     # --- RENDERIZADO EN PESTAÑAS ---
     tab1, tab2 = st.tabs(["📊 Gráfico Interactivo", "📋 Tabla de Datos"])
     
     with tab1:
-        # MODIFICA ESTA LÍNEA AGREGANDO theme=None:
         st.plotly_chart(fig, theme=None, use_container_width=True)
         
     with tab2:
-        # Crear la configuración de formato para las columnas de la tabla
         config_visual = {}
+        
+        # 📅 Formato visual para la columna de Fecha en la tabla sin corromper sus propiedades
+        if 'Maturity' in df_filtrado.columns:
+            config_visual['Maturity'] = st.column_config.DateColumn(
+                format="DD/MM/YYYY"
+            )
         
         # 1️⃣ Formato para columnas de Porcentaje
         columnas_a_formatear = ['YTW %', 'Coupon %', 'Prev monthYTW%']
-        
         for col in columnas_a_formatear:
             if col in df_filtrado.columns:
                 config_visual[col] = st.column_config.NumberColumn(
-                    format="%.2f%%"  # Agrega el % al final con 2 decimales
+                    format="%.2f%%"  
                 )
         
         # 2️⃣ Formato para columnas de Dinero / Dólares
-        # (Sacado fuera del bucle anterior y alineado correctamente)
         columnas_a_formatear2 = ['Minimum Settlement', 'Outstanding US$']
-        
         for col in columnas_a_formatear2:
             if col in df_filtrado.columns:
                 config_visual[col] = st.column_config.NumberColumn(
-                    format="$%.2f"  # Agrega el signo $ al principio con 2 decimales
+                    format="$%.2f"  
                 )
                     
         # Renderizar la tabla con la configuración visual aplicada
@@ -189,7 +201,6 @@ try:
             use_container_width=True,
             column_config=config_visual
         )
-                
 
 except FileNotFoundError:
     st.error(f"❌ No se pudo encontrar el archivo '{NOMBRE_ARCHIVO_EXCEL}' en tu repositorio de GitHub.")
