@@ -201,53 +201,54 @@ try:
             df_filtrado, 
             use_container_width=True,
             column_config=config_visual
-        )
-            with tab3:
-                    st.subheader("📌 Selección de Bonos Recomendados por el Equipo")
-                    st.markdown("Analizamos el mercado actual y destacamos los siguientes activos por su relación riesgo/retorno:")
+        )            
+            
+    with tab3:
+        st.subheader("📌 Selección de Bonos Recomendados por el Equipo")
+        st.markdown("Analizamos el mercado actual y destacamos los siguientes activos por su relación riesgo/retorno:")
+        
+        # Verificar si existe la columna en el Excel para evitar que se caiga
+        if 'Recomendado' in df.columns:
+            # Filtramos únicamente los bonos marcados con 'SI'
+            df_recom = df[df['Recomendado'] == 'SI']
+            
+            if not df_recom.empty:
+                # Iteramos sobre cada bono recomendado para armar su "tarjeta"
+                for idx, row in df_recom.iterrows():
                     
-                    # Verificar si existe la columna en el Excel para evitar que se caiga
-                    if 'Recomendado' in df.columns:
-                        # Filtramos únicamente los bonos marcados con 'SI'
-                        df_recom = df[df['Recomendado'] == 'SI']
+                    # Creamos una caja contenedora con borde para cada bono (Estilo Tarjeta)
+                    with st.container(border=True):
+                        # Dividimos la tarjeta en 4 columnas visuales
+                        c1, c2, c3, c4 = st.columns([2, 1, 1, 1])
                         
-                        if not df_recom.empty:
-                            # Iteramos sobre cada bono recomendado para armar su "tarjeta"
-                            for idx, row in df_recom.iterrows():
+                        with c1:
+                            # Nombre del emisor y su clasificación
+                            st.markdown(f"### 🏢 {row[col_emisor]}")
+                            tipo_bono = "Investment Grade (IG)" if row['IG - HY'] == 'IG' else "High Yield (HY)"
+                            st.caption(f"**Categoría:** {tipo_bono} | **Rating:** {row['Rating']}")
+                        
+                        with c2:
+                            # Rendimiento Actual vs Mes Anterior
+                            ytw_actual = row['YTW %']
+                            # Si existe el mes anterior calcula el diferencial, si no, solo muestra el número
+                            if 'Prev monthYTW%' in df.columns and pd.notnull(row['Prev monthYTW%']):
+                                dif = ytw_actual - row['Prev monthYTW%']
+                                st.metric(label="Rendimiento (YTW)", value=f"{ytw_actual:.2f}%", delta=f"{dif:+.2f}% vs mes ant.")
+                            else:
+                                st.metric(label="Rendimiento (YTW)", value=f"{ytw_actual:.2f}%")
                                 
-                                # Creamos una caja contenedora con borde para cada bono (Estilo Tarjeta)
-                                with st.container(border=True):
-                                    # Dividimos la tarjeta en 4 columnas visuales
-                                    c1, c2, c3, c4 = st.columns([2, 1, 1, 1])
-                                    
-                                    with c1:
-                                        # Nombre del emisor y su clasificación
-                                        st.markdown(f"### 🏢 {row[col_emisor]}")
-                                        tipo_bono = "Investment Grade (IG)" if row['IG - HY'] == 'IG' else "High Yield (HY)"
-                                        st.caption(f"**Categoría:** {tipo_bono} | **Rating:** {row['Rating']}")
-                                    
-                                    with c2:
-                                        # Rendimiento Actual vs Mes Anterior
-                                        ytw_actual = row['YTW %']
-                                        # Si existe el mes anterior calcula el diferencial, si no, solo muestra el número
-                                        if 'Prev monthYTW%' in df.columns and pd.notnull(row['Prev monthYTW%']):
-                                            dif = ytw_actual - row['Prev monthYTW%']
-                                            st.metric(label="Rendimiento (YTW)", value=f"{ytw_actual:.2f}%", delta=f"{dif:+.2f}% vs mes ant.")
-                                        else:
-                                            st.metric(label="Rendimiento (YTW)", value=f"{ytw_actual:.2f}%")
-                                            
-                                    with c3:
-                                        # Tasa de cupón
-                                        st.metric(label="Cupón Anual", value=f"{row['Coupon %']:.2f}%")
-                                        
-                                    with c4:
-                                        # Fecha de Vencimiento formateada de forma segura
-                                        fecha_txt = row['Maturity'].strftime('%d/%m/%Y') if isinstance(row['Maturity'], pd.Timestamp) else str(row['Maturity'])
-                                        st.metric(label="Vencimiento", value=fecha_txt)
-                        else:
-                            st.info("💡 Actualmente no hay ningún bono recomendado")
-                    else:
-                        st.warning("⚠️ Para activar esta pestaña, necesitas agregar una columna llamada 'Recomendado' en tu archivo Excel con la palabra 'SI' en tus favoritos.")
+                        with c3:
+                            # Tasa de cupón
+                            st.metric(label="Cupón Anual", value=f"{row['Coupon %']:.2f}%")
+                            
+                        with c4:
+                            # Fecha de Vencimiento formateada de forma segura
+                            fecha_txt = row['Maturity'].strftime('%d/%m/%Y') if isinstance(row['Maturity'], pd.Timestamp) else str(row['Maturity'])
+                            st.metric(label="Vencimiento", value=fecha_txt)
+            else:
+                st.info("💡 Actualmente no hay ningún bono recomendado")
+        else:
+            st.warning("⚠️ Para activar esta pestaña, necesitas agregar una columna llamada 'Recomendado' en tu archivo Excel con la palabra 'SI' en tus favoritos.")
 
 except FileNotFoundError:
     st.error(f"❌ No se pudo encontrar el archivo '{NOMBRE_ARCHIVO_EXCEL}' en tu repositorio de GitHub.")
