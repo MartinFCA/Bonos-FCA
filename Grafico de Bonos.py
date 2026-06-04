@@ -208,9 +208,9 @@ try:
         st.markdown("Analizamos el mercado actual y destacamos los siguientes activos por su relación riesgo/retorno:")
         
         # Verificar si existe la columna en el Excel para evitar que se caiga
-        if 'Recomendado' in df.columns:
+        if 'Recomendados' in df.columns:
             # Filtramos únicamente los bonos marcados con 'SI'
-            df_recom = df[df['Recomendado'] == 'SI']
+            df_recom = df[df['Recomendados'] == 'SI']
             
             if not df_recom.empty:
                 # Iteramos sobre cada bono recomendado para armar su "tarjeta"
