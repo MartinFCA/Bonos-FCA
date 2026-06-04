@@ -15,12 +15,16 @@ ocultar_estilos_streamlit = """
             <style>
             #MainMenu {visibility: hidden;}
             footer {visibility: hidden;}
+            div[data-testid="stMetric"] {text-align: center;} /* Centra títulos y números */
+            div[data-testid="stMetricValue"] {font-size: 24px; font-weight: bold;}
             </style>
             """
 st.markdown(ocultar_estilos_streamlit, unsafe_allow_html=True)
 
 st.title("📊 Curva de Rendimiento de Bonos")
 st.caption("📅 Análisis Visual de Activos • Actualizado al 15 de Mayo")
+# Reservamos el espacio para que el gráfico se dibuje aquí arriba después
+contenedor_grafico_y_pestañas = st.container()
 
 # ============================================================================
 # ⚙️ CONFIGURACIÓN DEL ARCHIVO: Pon aquí el nombre exacto de tu Excel en GitHub
@@ -52,11 +56,13 @@ try:
     # Determinar la columna de emisores de forma dinámica
     col_emisor = 'Guarantor/Organization' if 'Guarantor/Organization' in df.columns else 'Issuer'
     
-    # ============================================================================
+    
+    st.markdown("<br>", unsafe_allow_html=True) 
+# ============================================================================
     # 🛠️ SOLUCIÓN: PANEL ÚNICO DE FILTROS Y MÉTRICAS (PREMIUM Y SIEMPRE VISIBLE)
     # ============================================================================
     # Reemplazamos la barra lateral por un contenedor expandible en la pantalla principal
-    with st.expander("⚙️ CONFIGURACIÓN: Filtros del Portafolio y Resumen en Tiempo Real", expanded=True):
+    with st.expander("⚙️ Filtros de Bonos y Resumen en Tiempo Real", expanded=False):
         
         emisores_disponibles = sorted(df[col_emisor].unique())
         
@@ -82,8 +88,6 @@ try:
         with m3:
             avg_coupon = df_filtrado['Coupon %'].mean() if not df_filtrado.empty else 0
             st.metric(label="💵 Cupón Promedio Anual", value=f"{avg_coupon:.2f}%")
-
-    st.markdown("<br>", unsafe_allow_html=True) 
 
     # --- CREACIÓN DEL GRÁFICO INTERACTIVO (Fondo limpio institucional) ---
     fig = go.Figure()
