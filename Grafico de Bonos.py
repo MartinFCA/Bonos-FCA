@@ -4,27 +4,23 @@ import numpy as np
 import plotly.graph_objects as go
 import datetime  # 📆 Necesario para la conversión matemática de fechas
 
-# Configuración de la página web (Ancho completo con filtros expandidos por defecto)
+# Configuración de la página web (Ancho completo)
 st.set_page_config(
     page_title="Dashboard de Bonos", 
-    layout="wide",
-    initial_sidebar_state="expanded" # 🛠️ SOLUCIÓN: Hace que la barra lateral nunca se oculte sola
+    layout="wide"
 )
 
-# 🔒 MEDIDA DE SEGURIDAD Y ESTILO: Ocultar menús de desarrollo y refinar diseño de textos
+# 🔒 MEDIDA DE SEGURIDAD: Ocultamos menús de desarrollo pero DEJAMOS el header visible para evitar errores
 ocultar_estilos_streamlit = """
             <style>
             #MainMenu {visibility: hidden;}
             footer {visibility: hidden;}
-            header {visibility: hidden;}
-            div[data-testid="stMetricValue"] {font-size: 26px; font-weight: bold;} /* Métricas más imponentes */
             </style>
             """
 st.markdown(ocultar_estilos_streamlit, unsafe_allow_html=True)
 
 st.title("📊 Curva de Rendimiento de Bonos")
 st.caption("📅 Análisis Visual de Activos • Actualizado al 15 de Mayo")
-st.divider() # Línea divisoria elegante para estructurar el espacio
 
 # ============================================================================
 # ⚙️ CONFIGURACIÓN DEL ARCHIVO: Pon aquí el nombre exacto de tu Excel en GitHub
@@ -56,44 +52,46 @@ try:
     # Determinar la columna de emisores de forma dinámica
     col_emisor = 'Guarantor/Organization' if 'Guarantor/Organization' in df.columns else 'Issuer'
     
-    # --- BARRA LATERAL DE FILTROS ---
-    st.sidebar.header("⚙️ Filtros del Portafolio")
-    st.sidebar.markdown("Modifique las casillas para actualizar instantáneamente las curvas del modelo.")
-    emisores_disponibles = sorted(df[col_emisor].unique())
-    
-    # El filtro inicia con TODOS los emisores seleccionados por defecto automáticamente
-    emisores_seleccionados = st.sidebar.multiselect(
-        "Selecciona los emisores a INCLUIR:",
-        options=emisores_disponibles,
-        default=emisores_disponibles
-    )
-    
-    # Filtrado dinámico en tiempo real según la barra lateral
-    df_filtrado = df[df[col_emisor].isin(emisores_seleccionados)]
-    
     # ============================================================================
-    # 📊 MEJORA VISUAL: SECCIÓN DE TARJETAS INFORMATIVAS (KPI CARDS)
+    # 🛠️ SOLUCIÓN: PANEL ÚNICO DE FILTROS Y MÉTRICAS (PREMIUM Y SIEMPRE VISIBLE)
     # ============================================================================
-    m1, m2, m3 = st.columns(3)
-    with m1:
-        st.metric(label="🏢 Activos Seleccionados", value=f"{len(df_filtrado)} bonos")
-    with m2:
-        avg_ytw = df_filtrado['YTW %'].mean() if not df_filtrado.empty else 0
-        st.metric(label="📈 Rendimiento Promedio (YTW)", value=f"{avg_ytw:.2f}%")
-    with m3:
-        avg_coupon = df_filtrado['Coupon %'].mean() if not df_filtrado.empty else 0
-        st.metric(label="💵 Cupón Promedio Anual", value=f"{avg_coupon:.2f}%")
+    # Reemplazamos la barra lateral por un contenedor expandible en la pantalla principal
+    with st.expander("⚙️ CONFIGURACIÓN: Filtros del Portafolio y Resumen en Tiempo Real", expanded=True):
         
-    st.markdown("<br>", unsafe_allow_html=True) # Espacio en blanco de descompresión visual
+        emisores_disponibles = sorted(df[col_emisor].unique())
+        
+        # Filtro de emisores en la pantalla principal
+        emisores_seleccionados = st.multiselect(
+            "Selecciona los emisores a INCLUIR en las curvas de rendimiento:",
+            options=emisores_disponibles,
+            default=emisores_disponibles
+        )
+        
+        # Filtrado dinámico inmediato
+        df_filtrado = df[df[col_emisor].isin(emisores_seleccionados)]
+        
+        st.markdown("<hr style='margin: 15px 0; border: 0; border-top: 1px solid #ddd;'>", unsafe_allow_html=True)
+        
+        # Las métricas ahora viven aquí dentro, justo abajo de lo que seleccionas
+        m1, m2, m3 = st.columns(3)
+        with m1:
+            st.metric(label="🏢 Activos bajo Análisis", value=f"{len(df_filtrado)} bonos")
+        with m2:
+            avg_ytw = df_filtrado['YTW %'].mean() if not df_filtrado.empty else 0
+            st.metric(label="📈 Rendimiento Promedio (YTW)", value=f"{avg_ytw:.2f}%")
+        with m3:
+            avg_coupon = df_filtrado['Coupon %'].mean() if not df_filtrado.empty else 0
+            st.metric(label="💵 Cupón Promedio Anual", value=f"{avg_coupon:.2f}%")
 
-    # --- CREACIÓN DEL GRÁFICO INTERACTIVO (ESTILO PREMIUM) ---
+    st.markdown("<br>", unsafe_allow_html=True) 
+
+    # --- CREACIÓN DEL GRÁFICO INTERACTIVO (Fondo limpio institucional) ---
     fig = go.Figure()
     
-    # Colores originales de tu Colab
     color_ig = '#FF9944'  # Naranja claro
     color_hy = '#1F77B4'  # Azul oscuro
     
-    # 1. Dibujar primero las Líneas de Tendencia (Matemática basada en días ordinales)
+    # 1. Dibujar primero las Líneas de Tendencia
     for tipo, color in [('IG', color_ig), ('HY', color_hy)]:
         df_tipo = df_filtrado[df_filtrado['IG - HY'] == tipo]
         if len(df_tipo) >= 3:
@@ -111,11 +109,11 @@ try:
                     x=x_smooth_dates, y=p(x_smooth_num),
                     mode='lines', 
                     name=f'Trend {tipo}',
-                    line=dict(color=color, width=2.5), # Líneas con mayor nitidez
+                    line=dict(color=color, width=2.5),
                     hoverinfo='skip'
                 ))
 
-    # 2. Dibujar los Puntos de los Bonos (Distribuidos por su fecha exacta)
+    # 2. Dibujar los Puntos de los Bonos
     for tipo, color in [('IG', color_ig), ('HY', color_hy)]:
         df_puntos = df_filtrado[df_filtrado['IG - HY'] == tipo]
         if not df_puntos.empty:
@@ -124,7 +122,7 @@ try:
                 mode='markers', 
                 name='Investment Grade (IG)' if tipo == 'IG' else 'High Yield (HY)',
                 marker=dict(
-                    size=9, # Puntos ligeramente mayores para clics fluidos en tablets/móviles
+                    size=9, 
                     color=color, 
                     opacity=0.82, 
                     line=dict(width=1.5, color='white') 
@@ -138,18 +136,17 @@ try:
                 hovertemplate='%{text}<extra></extra>'
             ))
 
-    # 3. Configuración del Layout (Ejes, fondo y leyenda institucional)
+    # 3. Configuración del Layout (Ejes y leyenda clara flotante)
     fig.update_layout(
         title='<b>Análisis Dinámico de Curvas de Rendimiento (YTW)</b>',
         xaxis_title='<b>Fecha de Vencimiento</b>', 
         yaxis_title='<b>YTW - Yield to Worst (%)</b>', 
-        plot_bgcolor='#FDFDFD',   # Fondo interior limpio
+        plot_bgcolor='#FDFDFD',   
         paper_bgcolor='white',   
         hovermode='closest',
         height=660,              
         font=dict(color='#222222', family='Arial', size=12), 
         
-        # 🛠️ CONFIGURACIÓN DEL EJE X (Guías horizontales suaves añadidas)
         xaxis=dict(
             type='date',         
             showline=True,       
@@ -158,11 +155,9 @@ try:
             ticks='outside',     
             tickcolor='#444444',   
             showgrid=True,
-            gridcolor='#ECECEC', # Grilla suave para fácil lectura de coordenadas
+            gridcolor='#ECECEC', 
             mirror=False         
         ),
-        
-        # 🛠️ CONFIGURACIÓN DEL EJE Y
         yaxis=dict(
             showline=True,       
             linecolor='#444444',   
@@ -174,19 +169,17 @@ try:
             gridcolor='#ECECEC', 
             mirror=False         
         ),
-        
-        # 🛠️ REESTILIZADO: Leyenda flotante premium (reemplaza al recuadro negro sólido)
         legend=dict(
             x=0.015, 
             y=0.985, 
-            bgcolor='rgba(255, 255, 255, 0.92)', # Caja blanca acrílica elegante
+            bgcolor='rgba(255, 255, 255, 0.92)', 
             bordercolor='#CCCCCC',              
             borderwidth=1,
             font=dict(color='black', size=11) 
         )
     ) 
   
-    # --- RENDERIZADO EN PESTAÑAS (Alineadas perfectamente bajo el bloque 'try') ---
+    # --- RENDERIZADO EN PESTAÑAS ---
     tab1, tab2, tab3 = st.tabs(["📊 Gráfico Interactivo", "📋 Tabla de Datos", "⬆️ Bonos Recomendados"])
     
     with tab1:
@@ -195,13 +188,11 @@ try:
     with tab2:
         config_visual = {}
         
-        # 📅 Formato visual para la columna de Fecha en la tabla
         if 'Maturity' in df_filtrado.columns:
             config_visual['Maturity'] = st.column_config.DateColumn(
                 format="DD/MM/YYYY"
             )
         
-        # 1️⃣ Formato para columnas de Porcentaje
         columnas_a_formatear = ['YTW %', 'Coupon %', 'Prev monthYTW%']
         for col in columnas_a_formatear:
             if col in df_filtrado.columns:
@@ -209,7 +200,6 @@ try:
                     format="%.2f%%"  
                 )
         
-        # 2️⃣ Formato para columnas de Dinero / Dólares
         columnas_a_formatear2 = ['Minimum Settlement', 'Outstanding US$']
         for col in columnas_a_formatear2:
             if col in df_filtrado.columns:
@@ -217,7 +207,6 @@ try:
                     format="$%.2f"  
                 )
                     
-        # Renderizar la tabla con la configuración visual aplicada
         st.dataframe(
             df_filtrado, 
             use_container_width=True,
@@ -228,30 +217,22 @@ try:
         st.subheader("📌 Selección de Bonos Recomendados por el Equipo")
         st.markdown("Analizamos el mercado actual y destacamos los siguientes activos por su atractiva relación riesgo/retorno:")
         
-        # 🛠️ FLEXIBILIDAD: Busca automáticamente si tu columna se llama 'Recomendado' o 'Recomendados'
         col_recom = 'Recomendados' if 'Recomendados' in df.columns else ('Recomendado' if 'Recomendado' in df.columns else None)
         
         if col_recom:
-            # Filtramos únicamente los bonos marcados con 'SI'
             df_recom = df[df[col_recom] == 'SI']
             
             if not df_recom.empty:
-                # Iteramos sobre cada bono recomendado para armar su "tarjeta"
                 for idx, row in df_recom.iterrows():
-                    
-                    # Creamos una caja contenedora con borde para cada bono (Estilo Tarjeta)
                     with st.container(border=True):
-                        # Dividimos la tarjeta en 4 columnas visuales balancedas
                         c1, c2, c3, c4 = st.columns([2, 1, 1, 1])
                         
                         with c1:
-                            # Nombre del emisor y su clasificación
                             st.markdown(f"### 🏢 {row[col_emisor]}")
                             tipo_bono = "Investment Grade (IG)" if row['IG - HY'] == 'IG' else "High Yield (HY)"
                             st.caption(f"**Categoría:** {tipo_bono} | **Rating:** {row['Rating']}")
                         
                         with c2:
-                            # Rendimiento Actual vs Mes Anterior
                             ytw_actual = row['YTW %']
                             if 'Prev monthYTW%' in df.columns and pd.notnull(row['Prev monthYTW%']):
                                 dif = ytw_actual - row['Prev monthYTW%']
@@ -260,11 +241,9 @@ try:
                                 st.metric(label="Rendimiento (YTW)", value=f"{ytw_actual:.2f}%")
                                 
                         with c3:
-                            # Tasa de cupón
                             st.metric(label="Cupón Anual", value=f"{row['Coupon %']:.2f}%")
                             
                         with c4:
-                            # Fecha de Vencimiento formateada de forma segura
                             fecha_txt = row['Maturity'].strftime('%d/%m/%Y') if isinstance(row['Maturity'], pd.Timestamp) else str(row['Maturity'])
                             st.metric(label="Vencimiento", value=fecha_txt)
             else:
