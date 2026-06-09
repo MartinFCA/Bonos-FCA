@@ -7,7 +7,6 @@ import requests
 import io
 from urllib.error import URLError
 import warnings
-warnings.filterwarnings('ignore')
 
 # Configuración de la página
 st.set_page_config(
@@ -17,6 +16,9 @@ st.set_page_config(
     menu_items=None,
     theme="dark"
 )
+
+warnings.filterwarnings('ignore')
+
 
 # ============================================================================
 # 🎨 CONFIGURACIÓN VISUAL Y TEMA
