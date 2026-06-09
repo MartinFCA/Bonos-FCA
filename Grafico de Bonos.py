@@ -35,7 +35,7 @@ st.set_page_config(
     page_title="Dashboard de Bonos",
     layout="wide",
     initial_sidebar_state="collapsed",
-    menu_items=None
+    menu_items=None,
     theme="dark"
 )
 
