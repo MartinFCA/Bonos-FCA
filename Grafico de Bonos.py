@@ -445,11 +445,11 @@ with tab2:
     if 'Maturity' in df_filtrado.columns:
         config_visual['Maturity'] = st.column_config.DateColumn(format="DD/MM/YYYY")
     
-    for col in ['YTW %', 'Coupon %', 'Prev monthYTW%']:
+    for col in ['YTW %', 'Coupon %', 'YTW t-15']:
         if col in df_filtrado.columns:
             config_visual[col] = st.column_config.NumberColumn(format="%.2f%%")
 
-    for col in ['Minimum Settlement', 'Outstanding US$']:
+    for col in ['Minimum Settlement', 'OutstandingUS$']:
         if col in df_filtrado.columns:
             config_visual[col] = st.column_config.NumberColumn(format="$%.2f")
 
