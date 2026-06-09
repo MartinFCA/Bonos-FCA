@@ -57,7 +57,6 @@ ocultar_estilos = """
         border-radius: 9px 9px 0 0;
         color: #FFFFFF !important;
         font-weight: 500 !important;
-        border: 1px solid #515866 !important;
     }
     
     ::-webkit-scrollbar {width: 8px;}
@@ -70,7 +69,7 @@ st.markdown(ocultar_estilos, unsafe_allow_html=True)
 # ============================================================================
 # 🛠️ FUNCIONES AUXILIARES
 # ============================================================================
- 
+ #border: 1px solid #515866 !important;
 @st.cache_resource
 def get_session_state():
     """Mantiene estado entre reruns"""
