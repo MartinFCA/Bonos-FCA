@@ -453,7 +453,7 @@ with tab2:
         if col in df_filtrado.columns:
             config_visual[col] = st.column_config.NumberColumn(format="$%.2f")
 
-    for col in ['Minimum Settlement', 'Outstanding US$', 'Price']:
+    for col in ['Price']:
         if col in df_filtrado.columns:
             config_visual[col] = st.column_config.NumberColumn(format="$%.2f")
     
