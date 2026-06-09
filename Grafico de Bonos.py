@@ -53,7 +53,7 @@ ocultar_estilos = """
     
     /* FIX: Hacer visibles los labels de las tabs */
     button[data-baseweb="tab"] {
-        background: linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%);
+        background: linear-gradient(135deg, #0E1117 100%, #ffffff 100%);
         border-radius: 8px 8px 0 0;
         color: #222 !important;
         font-weight: 500 !important;
