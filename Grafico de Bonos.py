@@ -104,33 +104,25 @@ def get_session_state():
     return st.session_state
  
 @st.cache_data(ttl=300)
-def cargar_datos_onedrive(urls_intentar):
-    """
-    Intenta cargar datos de múltiples URLs de OneDrive.
-    Prueba cada una hasta encontrar la que funciona.
-    """
-    for idx, url in enumerate(urls_intentar, 1):
-        try:
-            st.info(f"⏳ Intentando URL {idx}/{len(urls_intentar)}...")
-            
-            # Usar requests con timeout
-            response = requests.get(url, timeout=30)
-            
-            if response.status_code == 200:
-                # Leer el Excel
-                df = pd.read_excel(io.BytesIO(response.content))
-                st.success(f"✅ Conexión exitosa con URL {idx}")
-                return df, None
-                
-        except requests.Timeout:
-            continue
-        except requests.RequestException:
-            continue
-        except Exception as e:
-            continue
-    
-    # Si todas fallan
-    return None, "❌ No se pudo conectar con ninguna URL de OneDrive"
+try:
+    # Leer datos automáticamente desde el repositorio de GitHub
+    df = cargar_datos(NOMBRE_ARCHIVO_EXCEL)
+
+    # 📆 SOLUCIÓN: Convertir a Fecha Real (Datetime) para mantener orden cronológico exacto
+    if 'Maturity' in df.columns:
+        df['Maturity'] = pd.to_datetime(df['Maturity'], errors='coerce')
+        
+    # Limpieza de filas vacías basada en la fecha y el rendimiento
+    df = df.dropna(subset=['Maturity', 'YTW %'])
+        
+    # 📊 Normalizar todas las columnas de porcentaje a escala 0-100
+    columnas_porcentaje = ['YTW %', 'Coupon %', 'Prev monthYTW%']
+    for col in columnas_porcentaje:
+        if col in df.columns and df[col].max() <= 1.0:
+            df[col] = df[col] * 100
+
+    # Determinar la columna de emisores de forma dinámica
+    col_emisor = 'Guarantor/Organization' if 'Guarantor/Organization' in df.columns else 'Issuer'
  
 def validar_y_preparar_datos(df):
     """
