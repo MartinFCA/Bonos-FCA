@@ -106,7 +106,7 @@ def get_session_state():
 @st.cache_data(ttl=300)
 try:
     # Leer datos automáticamente desde el repositorio de GitHub
-    df = cargar_datos(NOMBRE_ARCHIVO_EXCEL)
+    df = cargar_datos(NOMBRE_ARCHIVO)
 
     # 📆 SOLUCIÓN: Convertir a Fecha Real (Datetime) para mantener orden cronológico exacto
     if 'Maturity' in df.columns:
