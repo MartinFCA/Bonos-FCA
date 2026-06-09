@@ -55,7 +55,7 @@ ocultar_estilos = """
     button[data-baseweb="tab"] {
         background: linear-gradient(135deg, #0E1117 100%, #ffffff 100%);
         border-radius: 8px 8px 0 0;
-        color: #222 !important;
+        color: #FFFFFF !important;
         font-weight: 500 !important;
     }
     
