@@ -89,7 +89,7 @@ st.markdown(ocultar_estilos, unsafe_allow_html=True)
  
 # ============================================================================
  #Para pruebas locales, puedes usar un archivo local:
- NOMBRE_ARCHIVO = "Bonos Ejemplo.xlsx"  # Descomenta para usar archivo local
+ #NOMBRE_ARCHIVO = "Bonos Ejemplo.xlsx"  # Descomenta para usar archivo local
 
 # ============================================================================
 # 🛠️ FUNCIONES AUXILIARES
@@ -104,25 +104,20 @@ def get_session_state():
     return st.session_state
  
 @st.cache_data(ttl=300)
-try:
-    # Leer datos automáticamente desde el repositorio de GitHub
-    df = cargar_datos(NOMBRE_ARCHIVO)
-
-    # 📆 SOLUCIÓN: Convertir a Fecha Real (Datetime) para mantener orden cronológico exacto
-    if 'Maturity' in df.columns:
-        df['Maturity'] = pd.to_datetime(df['Maturity'], errors='coerce')
+def cargar_datos_github():
+    """Carga el archivo Excel desde el repositorio GitHub"""
+    try:
+        # URL raw del archivo en GitHub
+        url = "https://raw.githubusercontent.com/tu-usuario/bonos-fca/main/Bonos%20-%20FCA%20Asset%20Management.xlsm"
         
-    # Limpieza de filas vacías basada en la fecha y el rendimiento
-    df = df.dropna(subset=['Maturity', 'YTW %'])
-        
-    # 📊 Normalizar todas las columnas de porcentaje a escala 0-100
-    columnas_porcentaje = ['YTW %', 'Coupon %', 'Prev monthYTW%']
-    for col in columnas_porcentaje:
-        if col in df.columns and df[col].max() <= 1.0:
-            df[col] = df[col] * 100
+        response = requests.get(url, timeout=30)
+        if response.status_code == 200:
+            return pd.read_excel(io.BytesIO(response.content)), None
+        else:
+            return None, f"Error descargando desde GitHub: {response.status_code}"
+    except Exception as e:
+        return None, f"Error: {str(e)}"
 
-    # Determinar la columna de emisores de forma dinámica
-    col_emisor = 'Guarantor/Organization' if 'Guarantor/Organization' in df.columns else 'Issuer'
  
 def validar_y_preparar_datos(df):
     """
@@ -390,7 +385,7 @@ with col_header_2:
 st.markdown("")
  
 with st.spinner("⏳ Conectando a OneDrive (esto puede tomar 10-15 segundos)..."):
-    df, error = cargar_datos_onedrive(ONEDRIVE_URLS)
+    df, error = cargar_datos_github()
  
 if error:
     st.error(error)
