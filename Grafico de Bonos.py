@@ -398,43 +398,7 @@ with col_header_2:
 # ============================================================================
 # 📥 CARGAR DATOS
 # ============================================================================
-st.markdown("")
- 
-with st.spinner("⏳ Conectando a OneDrive (esto puede tomar 10-15 segundos)..."):
-   
- 
-if error:
-    st.error(error)
-    
-    with st.expander("🔧 Opciones Alternativas de Carga", expanded=True):
-        st.markdown("""
-        ### Si OneDrive no funciona, tienes estas opciones:
-        
-        **Opción 1: Descargar manualmente y usar archivo local**
-        1. Descarga `Bonos - FCA Asset Management.xlsm` desde OneDrive
-        2. Colócalo en la misma carpeta que el script
-        3. Usa esta línea en el código:
-        ```python
-        df = pd.read_excel("Bonos - FCA Asset Management.xlsm")
-        ```
-        
-        **Opción 2: Usar Google Drive (más confiable)**
-        1. Sube el archivo a Google Drive
-        2. Haz clic derecho → "Compartir" → Cualquiera puede ver
-        3. Obtén el ID del archivo
-        4. Usa:
-        ```python
-        DRIVE_URL = "https://docs.google.com/spreadsheets/d/{FILE_ID}/export?format=xlsx"
-        df = pd.read_excel(DRIVE_URL)
-        ```
-        
-        **Opción 3: Convertir XLSM a XLSX**
-        - Abre el archivo en Excel/Calc
-        - Guardar como: .xlsx (no macro)
-        - Intenta de nuevo
-        """)
-    st.stop()
- 
+st.markdown("") 
 # Validar datos
 df = validar_y_preparar_datos(df)
 if df is None or df.empty:
