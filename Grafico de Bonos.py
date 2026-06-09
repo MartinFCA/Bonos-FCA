@@ -103,20 +103,28 @@ def get_session_state():
         st.session_state.error_mensaje = None
     return st.session_state
  
+NOMBRE_ARCHIVO_EXCEL = "Bonos Ejemplo.xlsx"
+
 @st.cache_data(ttl=300)
-def cargar_datos_github():
-    """Carga el archivo Excel desde el repositorio GitHub"""
-    try:
-        # URL raw del archivo en GitHub
-        url = "https://raw.githubusercontent.com/tu-usuario/bonos-fca/main/Bonos%20-%20FCA%20Asset%20Management.xlsm"
-        
-        response = requests.get(url, timeout=30)
-        if response.status_code == 200:
-            return pd.read_excel(io.BytesIO(response.content)), None
-        else:
-            return None, f"Error descargando desde GitHub: {response.status_code}"
-    except Exception as e:
-        return None, f"Error: {str(e)}"
+def cargar_datos(ruta):
+    return pd.read_excel(ruta)
+
+try:
+    df = cargar_datos(NOMBRE_ARCHIVO_EXCEL)
+    
+    if 'Maturity' in df.columns:
+        df['Maturity'] = pd.to_datetime(df['Maturity'], errors='coerce')
+    
+    df = df.dropna(subset=['Maturity', 'YTW %'])
+    
+    columnas_porcentaje = ['YTW %', 'Coupon %', 'Prev monthYTW%']
+    for col in columnas_porcentaje:
+        if col in df.columns and df[col].max() <= 1.0:
+            df[col] = df[col] * 100
+    
+    col_emisor = 'Guarantor/Organization' if 'Guarantor/Organization' in df.columns else 'Issuer'
+    
+    st.markdown("<br>", unsafe_allow_html=True)
 
  
 def validar_y_preparar_datos(df):
