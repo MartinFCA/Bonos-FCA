@@ -401,7 +401,7 @@ with col_header_2:
 st.markdown("")
  
 with st.spinner("⏳ Conectando a OneDrive (esto puede tomar 10-15 segundos)..."):
-    df, error = cargar_datos_github()
+   
  
 if error:
     st.error(error)
