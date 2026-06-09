@@ -14,8 +14,8 @@ warnings.filterwarnings('ignore')
 # ============================================================================
 TEMA = {
     'bg_principal': '#F8F9FA',
-    'color_IG': '#00A651',      # Verde profesional
-    'color_HY': '#D32F2F',      # Rojo profesional
+    'color_IG': '#1F77B4',      # Azul profesional
+    'color_HY': '#FF9944',      # Naranja Claro profesional
     'color_grid': '#E0E0E0',
     'color_texto': '#222222',
     'color_border': '#CCCCCC',
@@ -72,24 +72,6 @@ ocultar_estilos = """
 </style>
 """
 st.markdown(ocultar_estilos, unsafe_allow_html=True)
-
-## ============================================================================
-# ⚙️ CONFIGURACIÓN: ENLACE DE ONEDRIVE (Tu enlace)
-# ============================================================================
- 
-# ✅ TU ENLACE ACTUAL:
-#TU_ENLACE_ONEDRIVE = "https://1drv.ms/x/c/74b4ddab53a69d15/IQBOAEOpBkSGR6-CgUzs9vH-ARIfQ_2GFrbRQRZ9mmWzIsI?e=VdNhhY"
- 
-# Convertimos a URL de descarga directa
-#ONEDRIVE_URLS = [
- #   "https://1drv.ms/x/c/74b4ddab53a69d15!IQBOAEOpBkSGR6-CgUzs9vH-ARIfQ_2GFrbRQRZ9mmWzIsI?download=1",
-  #  "https://1drv.ms/download?resid=74b4ddab53a69d15!IQBOAEOpBkSGR6-CgUzs9vH-ARIfQ_2GFrbRQRZ9mmWzIsI",
-   # "https://onedrive.live.com/download?resid=74b4ddab53a69d15!IQBOAEOpBkSGR6-CgUzs9vH-ARIfQ_2GFrbRQRZ9mmWzIsI",
-#]
- 
-# ============================================================================
- #Para pruebas locales, puedes usar un archivo local:
- #NOMBRE_ARCHIVO = "Bonos Ejemplo.xlsx"  # Descomenta para usar archivo local
 
 # ============================================================================
 # 🛠️ FUNCIONES AUXILIARES
