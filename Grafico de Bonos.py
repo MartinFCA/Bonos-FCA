@@ -92,12 +92,13 @@ try:
     
     df = df.dropna(subset=['Maturity', 'YTW %'])
     
-    columnas_porcentaje = ['YTW %', 'Coupon %', 'Prev monthYTW%']
+    columnas_porcentaje = ['YTW %', 'Coupon %', 'YTW t-15']
     for col in columnas_porcentaje:
         if col in df.columns and df[col].max() <= 1.0:
             df[col] = df[col] * 100
     
     col_emisor = 'Guarantor/Organization' if 'Guarantor/Organization' in df.columns else 'Issuer'
+
     
     st.markdown("<br>", unsafe_allow_html=True)
 
@@ -447,6 +448,10 @@ with tab2:
     for col in ['YTW %', 'Coupon %', 'Prev monthYTW%']:
         if col in df_filtrado.columns:
             config_visual[col] = st.column_config.NumberColumn(format="%.2f%%")
+
+    for col in ['Minimum Settlement'. 'OutstandingUS$']
+        if col in df_filtrado.columns:
+            config_visual[col] = st.column_config.Numbercolumn(format="$%.2f")
     
     st.dataframe(
         df_filtrado.sort_values('Maturity'),
@@ -499,5 +504,3 @@ with col_footer_1:
 with col_footer_2:
     st.caption(f"📊 **Total de registros:** {len(df)}")
  
-with col_footer_3:
-    st.caption("🔄 Se actualiza automáticamente cada 5 minutos")
