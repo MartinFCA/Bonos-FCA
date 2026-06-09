@@ -125,16 +125,16 @@ try:
     col_emisor = 'Guarantor/Organization' if 'Guarantor/Organization' in df.columns else 'Issuer'
     
     st.markdown("<br>", unsafe_allow_html=True)
-    
-    except FileNotFoundError:
+
+except FileNotFoundError:
     st.error(f"❌ No se encontró el archivo '{NOMBRE_ARCHIVO_EXCEL}'")
     st.info("Asegúrate de que el archivo esté en la misma carpeta que el script.")
     st.stop()
-    except Exception as e:
+except Exception as e:
     st.error(f"❌ Error al cargar datos: {str(e)}")
     st.stop()
 
- 
+
 def validar_y_preparar_datos(df):
     """
     Valida estructura del Excel y prepara datos para análisis.
