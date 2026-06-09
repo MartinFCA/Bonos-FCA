@@ -322,16 +322,12 @@ def mostrar_bono_recomendado(row, col_emisor):
 # ============================================================================
 # 📊 TÍTULO Y HEADER
 # ============================================================================
-col_header_1, col_header_2 = st.columns([0.85, 0.15])
+col_header_1 = st.columns([0.85, 0.15])
  
 with col_header_1:
     st.title("📊 Curva de Rendimiento de Bonos")
     st.caption("📅 FCA Asset Management • Dashboard Interactivo")
- 
-with col_header_2:
-    if st.button("🔄 Actualizar", use_container_width=True):
-        st.cache_data.clear()
-        st.rerun()
+
  
 # ============================================================================
 # 📥 CARGAR DATOS
