@@ -451,7 +451,7 @@ with tab2:
 
     for col in ['Minimum Settlement', 'Outstanding US$']:
         if col in df_filtrado.columns:
-            config_visual[col] = st.column_config.NumberColumn(format="$%.2f")
+            config_visual[col] = st.column_config.NumberColumn(format="$%.0f")
 
     for col in ['Price']:
         if col in df_filtrado.columns:
