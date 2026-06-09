@@ -9,6 +9,15 @@ from urllib.error import URLError
 import warnings
 warnings.filterwarnings('ignore')
 
+# Configuración de la página
+st.set_page_config(
+    page_title="Dashboard de Bonos",
+    layout="wide",
+    initial_sidebar_state="collapsed",
+    menu_items=None,
+    theme="dark"
+)
+
 # ============================================================================
 # 🎨 CONFIGURACIÓN VISUAL Y TEMA
 # ============================================================================
@@ -30,14 +39,6 @@ RATING_COLORS = {
     'D': '#000000'
 }
 
-# Configuración de la página
-st.set_page_config(
-    page_title="Dashboard de Bonos",
-    layout="wide",
-    initial_sidebar_state="collapsed",
-    menu_items=None,
-    theme="dark"
-)
 
 # ============================================================================
 # 🔒 OCULTAR ELEMENTOS DE STREAMLIT
