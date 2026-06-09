@@ -449,9 +449,13 @@ with tab2:
         if col in df_filtrado.columns:
             config_visual[col] = st.column_config.NumberColumn(format="%.2f%%")
 
-    for col in ['Minimum Settlement'. 'OutstandingUS$']
+    for col in ['Minimum Settlement', 'Outstanding US$']:
         if col in df_filtrado.columns:
-            config_visual[col] = st.column_config.Numbercolumn(format="$%.2f")
+            config_visual[col] = st.column_config.NumberColumn(format="$%.2f")
+
+    for col in ['Minimum Settlement', 'Outstanding US$', 'Price']:
+        if col in df_filtrado.columns:
+            config_visual[col] = st.column_config.NumberColumn(format="$%.2f")
     
     st.dataframe(
         df_filtrado.sort_values('Maturity'),
