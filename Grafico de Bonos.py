@@ -88,7 +88,7 @@ st.markdown(ocultar_estilos, unsafe_allow_html=True)
 #]
  
 # ============================================================================
- Para pruebas locales, puedes usar un archivo local:
+ #Para pruebas locales, puedes usar un archivo local:
  NOMBRE_ARCHIVO = "Bonos Ejemplo.xlsx"  # Descomenta para usar archivo local
 
 # ============================================================================
