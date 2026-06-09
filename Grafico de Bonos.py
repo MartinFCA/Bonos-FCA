@@ -78,18 +78,18 @@ st.markdown(ocultar_estilos, unsafe_allow_html=True)
 # ============================================================================
  
 # ✅ TU ENLACE ACTUAL:
-TU_ENLACE_ONEDRIVE = "https://1drv.ms/x/c/74b4ddab53a69d15/IQBOAEOpBkSGR6-CgUzs9vH-ARIfQ_2GFrbRQRZ9mmWzIsI?e=VdNhhY"
+#TU_ENLACE_ONEDRIVE = "https://1drv.ms/x/c/74b4ddab53a69d15/IQBOAEOpBkSGR6-CgUzs9vH-ARIfQ_2GFrbRQRZ9mmWzIsI?e=VdNhhY"
  
 # Convertimos a URL de descarga directa
-ONEDRIVE_URLS = [
-    "https://1drv.ms/x/c/74b4ddab53a69d15!IQBOAEOpBkSGR6-CgUzs9vH-ARIfQ_2GFrbRQRZ9mmWzIsI?download=1",
-    "https://1drv.ms/download?resid=74b4ddab53a69d15!IQBOAEOpBkSGR6-CgUzs9vH-ARIfQ_2GFrbRQRZ9mmWzIsI",
-    "https://onedrive.live.com/download?resid=74b4ddab53a69d15!IQBOAEOpBkSGR6-CgUzs9vH-ARIfQ_2GFrbRQRZ9mmWzIsI",
-]
+#ONEDRIVE_URLS = [
+ #   "https://1drv.ms/x/c/74b4ddab53a69d15!IQBOAEOpBkSGR6-CgUzs9vH-ARIfQ_2GFrbRQRZ9mmWzIsI?download=1",
+  #  "https://1drv.ms/download?resid=74b4ddab53a69d15!IQBOAEOpBkSGR6-CgUzs9vH-ARIfQ_2GFrbRQRZ9mmWzIsI",
+   # "https://onedrive.live.com/download?resid=74b4ddab53a69d15!IQBOAEOpBkSGR6-CgUzs9vH-ARIfQ_2GFrbRQRZ9mmWzIsI",
+#]
  
 # ============================================================================
-# Para pruebas locales, puedes usar un archivo local:
-# NOMBRE_ARCHIVO = "Bonos Ejemplo.xlsx"  # Descomenta para usar archivo local
+ Para pruebas locales, puedes usar un archivo local:
+ NOMBRE_ARCHIVO = "Bonos Ejemplo.xlsx"  # Descomenta para usar archivo local
 
 # ============================================================================
 # 🛠️ FUNCIONES AUXILIARES
