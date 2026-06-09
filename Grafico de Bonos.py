@@ -49,7 +49,7 @@ ocultar_estilos = """
     
     div[data-testid="stMetric"] {text-align: center;}
     div[data-testid="stMetricValue"] {font-size: 28px; font-weight: bold;}
-    div[data-testid="stMetricLabel"] {font-size: 12px; text-transform: uppercase; color: #666;}
+    div[data-testid="stMetricLabel"] {font-size: 12px; text-transform: uppercase; color: #ffffff;}
     
     /* FIX: Hacer visibles los labels de las tabs */
     button[data-baseweb="tab"] {
