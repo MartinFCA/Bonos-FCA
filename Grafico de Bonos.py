@@ -54,10 +54,10 @@ ocultar_estilos = """
     /* FIX: Hacer visibles los labels de las tabs */
     button[data-baseweb="tab"] {
         background: linear-gradient(135deg, #0E1117 100%, #ffffff 100%);
-        border-radius: 8px 8px 0 0;
+        border-radius: 9px 9px 0 0;
         color: #FFFFFF !important;
         font-weight: 500 !important;
-        border: 1px solid #758196 !important;
+        border: 1px solid #515866 !important;
     }
     
     ::-webkit-scrollbar {width: 8px;}
