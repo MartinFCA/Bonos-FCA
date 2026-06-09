@@ -57,7 +57,7 @@ ocultar_estilos = """
         border-radius: 8px 8px 0 0;
         color: #FFFFFF !important;
         font-weight: 500 !important;
-        border: 3px solid #d9e5fc !important;
+        border: 1px solid #758196 !important;
     }
     
     ::-webkit-scrollbar {width: 8px;}
