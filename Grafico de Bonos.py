@@ -71,25 +71,28 @@ ocultar_estilos = """
 """
 st.markdown(ocultar_estilos, unsafe_allow_html=True)
 
+## ============================================================================
+# ⚙️ CONFIGURACIÓN: ENLACE DE ONEDRIVE (Tu enlace)
 # ============================================================================
-# ⚙️ CONFIGURACIÓN: URL DE ONEDRIVE
+ 
+# ✅ TU ENLACE ACTUAL:
+TU_ENLACE_ONEDRIVE = "https://1drv.ms/x/c/74b4ddab53a69d15/IQBOAEOpBkSGR6-CgUzs9vH-ARIfQ_2GFrbRQRZ9mmWzIsI?e=VdNhhY"
+ 
+# Convertimos a URL de descarga directa
+ONEDRIVE_URLS = [
+    "https://1drv.ms/x/c/74b4ddab53a69d15!IQBOAEOpBkSGR6-CgUzs9vH-ARIfQ_2GFrbRQRZ9mmWzIsI?download=1",
+    "https://1drv.ms/download?resid=74b4ddab53a69d15!IQBOAEOpBkSGR6-CgUzs9vH-ARIfQ_2GFrbRQRZ9mmWzIsI",
+    "https://onedrive.live.com/download?resid=74b4ddab53a69d15!IQBOAEOpBkSGR6-CgUzs9vH-ARIfQ_2GFrbRQRZ9mmWzIsI",
+]
+ 
 # ============================================================================
-# INSTRUCCIONES PARA OBTENER EL URL:
-# 1. En OneDrive, haz clic derecho en tu archivo Excel
-# 2. Selecciona "Compartir" → "Copiar enlace"
-# 3. Abre el enlace en un navegador
-# 4. En la URL, busca: resid=XXXXXXXXX&authkey=YYYYYYYYY
-# 5. Copia la URL completa con estos parámetros
-
-ONEDRIVE_URL = "https://onedrive.live.com/download?resid=YOUR_RESID&authkey=YOUR_AUTHKEY"
-
 # Para pruebas locales, puedes usar un archivo local:
 # NOMBRE_ARCHIVO = "Bonos Ejemplo.xlsx"  # Descomenta para usar archivo local
 
 # ============================================================================
 # 🛠️ FUNCIONES AUXILIARES
 # ============================================================================
-
+ 
 @st.cache_resource
 def get_session_state():
     """Mantiene estado entre reruns"""
@@ -97,25 +100,39 @@ def get_session_state():
         st.session_state.datos_cargados = False
         st.session_state.error_mensaje = None
     return st.session_state
-
-@st.cache_data(ttl=300)  # Cache por 5 minutos
-def cargar_datos(url):
+ 
+@st.cache_data(ttl=300)
+def cargar_datos_onedrive(urls_intentar):
     """
-    Carga datos desde OneDrive o archivo local.
-    ttl=300: Actualiza cada 5 minutos automáticamente
+    Intenta cargar datos de múltiples URLs de OneDrive.
+    Prueba cada una hasta encontrar la que funciona.
     """
-    try:
-        df = pd.read_excel(url)
-        return df, None
-    except URLError as e:
-        return None, f"❌ Error de conexión: Verifica tu URL de OneDrive.\n{str(e)}"
-    except Exception as e:
-        return None, f"❌ Error al cargar datos: {str(e)}"
-
+    for idx, url in enumerate(urls_intentar, 1):
+        try:
+            st.info(f"⏳ Intentando URL {idx}/{len(urls_intentar)}...")
+            
+            # Usar requests con timeout
+            response = requests.get(url, timeout=30)
+            
+            if response.status_code == 200:
+                # Leer el Excel
+                df = pd.read_excel(io.BytesIO(response.content))
+                st.success(f"✅ Conexión exitosa con URL {idx}")
+                return df, None
+                
+        except requests.Timeout:
+            continue
+        except requests.RequestException:
+            continue
+        except Exception as e:
+            continue
+    
+    # Si todas fallan
+    return None, "❌ No se pudo conectar con ninguna URL de OneDrive"
+ 
 def validar_y_preparar_datos(df):
     """
     Valida estructura del Excel y prepara datos para análisis.
-    Retorna df procesado o None si hay errores.
     """
     # Columnas requeridas
     columnas_requeridas = ['Maturity', 'YTW %', 'Coupon %', 'IG - HY', 'Rating']
@@ -124,13 +141,15 @@ def validar_y_preparar_datos(df):
     if faltantes:
         st.error(f"❌ **Columnas faltantes en Excel:**\n{', '.join(faltantes)}")
         st.info("Tu Excel debe contener estas columnas: " + ", ".join(columnas_requeridas))
+        st.write("**Columnas disponibles en tu archivo:**")
+        st.code(", ".join(df.columns.tolist()))
         return None
     
     try:
         # Convertir fechas
         df['Maturity'] = pd.to_datetime(df['Maturity'], errors='coerce')
         
-        # Normalizar porcentajes (si están entre 0-1, multiplicar por 100)
+        # Normalizar porcentajes
         columnas_porcentaje = ['YTW %', 'Coupon %', 'Prev monthYTW%']
         for col in columnas_porcentaje:
             if col in df.columns:
@@ -149,24 +168,22 @@ def validar_y_preparar_datos(df):
     except Exception as e:
         st.error(f"❌ Error preparando datos: {str(e)}")
         return None
-
+ 
 def obtener_col_emisor(df):
     """Detecta dinámicamente la columna de emisores"""
     for col in ['Guarantor/Organization', 'Issuer', 'Emisor', 'issuer']:
         if col in df.columns:
             return col
-    # Si no encuentra ninguna, usar la primera columna no-numérica
     for col in df.columns:
         if df[col].dtype == 'object' and col not in ['IG - HY', 'Rating']:
             return col
     return None
-
+ 
 def agregar_tendencia(fig, df_tipo, tipo, color):
     """Agrega línea de tendencia polinómica al gráfico"""
     if len(df_tipo) < 3:
         return
     
-    # Agrupar por fecha y promediar
     grouped = df_tipo.groupby('Maturity').agg({'YTW %': 'mean'}).reset_index()
     grouped = grouped.sort_values('Maturity').reset_index(drop=True)
     
@@ -174,15 +191,12 @@ def agregar_tendencia(fig, df_tipo, tipo, color):
         return
     
     try:
-        # Convertir fechas a números para el polinomio
         x_numerico = grouped['Maturity'].apply(lambda x: x.toordinal()).values
         y_valores = grouped['YTW %'].values
         
-        # Ajustar polinomio de grado 2
         z = np.polyfit(x_numerico, y_valores, 2)
         p = np.poly1d(z)
         
-        # Crear línea suave
         x_smooth_num = np.linspace(x_numerico.min(), x_numerico.max(), 150)
         x_smooth_dates = [datetime.date.fromordinal(int(x)) for x in x_smooth_num]
         
@@ -197,14 +211,13 @@ def agregar_tendencia(fig, df_tipo, tipo, color):
         ))
     except Exception as e:
         st.warning(f"No se pudo calcular tendencia para {tipo}: {e}")
-
+ 
 def agregar_puntos(fig, df_puntos, tipo, color, col_emisor, nombre_tipo):
     """Agrega puntos de bonos al gráfico"""
     if df_puntos.empty:
         return
     
     try:
-        # Crear tooltips mejorados
         textos_hover = []
         for _, row in df_puntos.iterrows():
             fecha_txt = row['Maturity'].strftime('%d/%m/%Y') if isinstance(row['Maturity'], pd.Timestamp) else str(row['Maturity'])
@@ -234,25 +247,22 @@ def agregar_puntos(fig, df_puntos, tipo, color, col_emisor, nombre_tipo):
         ))
     except Exception as e:
         st.warning(f"Error al agregar puntos: {e}")
-
+ 
 def crear_grafico_interactivo(df_filtrado, col_emisor):
     """Crea el gráfico principal de curvas de rendimiento"""
     fig = go.Figure()
     
-    # Agregar tendencias para ambos tipos
     for tipo, color in [('IG', TEMA['color_IG']), ('HY', TEMA['color_HY'])]:
         df_tipo = df_filtrado[df_filtrado['IG - HY'] == tipo]
         if not df_tipo.empty and len(df_tipo) >= 3:
             agregar_tendencia(fig, df_tipo, tipo, color)
     
-    # Agregar puntos para ambos tipos
     for tipo, color, nombre in [('IG', TEMA['color_IG'], 'Investment Grade (IG)'),
                                  ('HY', TEMA['color_HY'], 'High Yield (HY)')]:
         df_puntos = df_filtrado[df_filtrado['IG - HY'] == tipo]
         if not df_puntos.empty:
             agregar_puntos(fig, df_puntos, tipo, color, col_emisor, nombre)
     
-    # Configurar layout
     fig.update_layout(
         title={
             'text': '<b>Análisis Dinámico de Curvas de Rendimiento (YTW)</b>',
@@ -305,7 +315,7 @@ def crear_grafico_interactivo(df_filtrado, col_emisor):
     )
     
     return fig
-
+ 
 def mostrar_bono_recomendado(row, col_emisor):
     """Muestra una tarjeta mejorada de bono recomendado"""
     rating = str(row['Rating'])
@@ -322,10 +332,7 @@ def mostrar_bono_recomendado(row, col_emisor):
         margin: 12px 0;
         box-shadow: 0 4px 12px rgba(0,0,0,0.08);
         border: 1px solid #E8E8E8;
-        transition: all 0.3s ease;
-    " onmouseover="this.style.boxShadow='0 6px 16px rgba(0,0,0,0.12)'" 
-       onmouseout="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.08)'">
-        
+    ">
         <h3 style="margin: 0 0 12px 0; color: #222; display: flex; align-items: center;">
             🏢 {row[col_emisor]}
             <span style="
@@ -368,73 +375,78 @@ def mostrar_bono_recomendado(row, col_emisor):
     </div>
     """
     st.markdown(html_card, unsafe_allow_html=True)
-
+ 
 # ============================================================================
 # 📊 TÍTULO Y HEADER
 # ============================================================================
 col_header_1, col_header_2 = st.columns([0.85, 0.15])
-
+ 
 with col_header_1:
     st.title("📊 Curva de Rendimiento de Bonos")
-    st.caption("📅 Análisis Visual de Activos • Dashboard Interactivo")
-
+    st.caption("📅 FCA Asset Management • Dashboard Interactivo")
+ 
 with col_header_2:
-    # Botón de actualización
     if st.button("🔄 Actualizar", use_container_width=True):
         st.cache_data.clear()
         st.rerun()
-
+ 
 # ============================================================================
 # 📥 CARGAR DATOS
 # ============================================================================
 st.markdown("")
-
-# Mostrar estado de carga
-with st.spinner("⏳ Cargando datos..."):
-    df, error = cargar_datos(ONEDRIVE_URL)
-
+ 
+with st.spinner("⏳ Conectando a OneDrive (esto puede tomar 10-15 segundos)..."):
+    df, error = cargar_datos_onedrive(ONEDRIVE_URLS)
+ 
 if error:
     st.error(error)
     
-    # Mostrar instrucciones
-    with st.expander("📋 ¿Cómo configurar la URL de OneDrive?", expanded=True):
+    with st.expander("🔧 Opciones Alternativas de Carga", expanded=True):
         st.markdown("""
-        ### Pasos para obtener tu URL:
+        ### Si OneDrive no funciona, tienes estas opciones:
         
-        1. **En OneDrive**, haz clic derecho en tu archivo Excel
-        2. Selecciona **"Compartir"** → **"Copiar enlace"**
-        3. Abre el enlace compartido en un navegador
-        4. En la barra de direcciones, busca los parámetros:
-           - `resid=XXXXXXXXX`
-           - `authkey=YYYYYYYYY`
-        5. Copia esta URL:
-           ```
-           https://onedrive.live.com/download?resid=XXXXXXXXX&authkey=YYYYYYYYY
-           ```
-        6. Reemplaza `ONEDRIVE_URL` en el código con tu URL
+        **Opción 1: Descargar manualmente y usar archivo local**
+        1. Descarga `Bonos - FCA Asset Management.xlsm` desde OneDrive
+        2. Colócalo en la misma carpeta que el script
+        3. Usa esta línea en el código:
+        ```python
+        df = pd.read_excel("Bonos - FCA Asset Management.xlsm")
+        ```
         
-        ### Alternativa: Usar archivo local
-        Si prefieres, puedes descargar el Excel y subirlo a tu carpeta de GitHub.
-        Luego carga desde el repositorio.
+        **Opción 2: Usar Google Drive (más confiable)**
+        1. Sube el archivo a Google Drive
+        2. Haz clic derecho → "Compartir" → Cualquiera puede ver
+        3. Obtén el ID del archivo
+        4. Usa:
+        ```python
+        DRIVE_URL = "https://docs.google.com/spreadsheets/d/{FILE_ID}/export?format=xlsx"
+        df = pd.read_excel(DRIVE_URL)
+        ```
+        
+        **Opción 3: Convertir XLSM a XLSX**
+        - Abre el archivo en Excel/Calc
+        - Guardar como: .xlsx (no macro)
+        - Intenta de nuevo
         """)
     st.stop()
-
+ 
 # Validar datos
 df = validar_y_preparar_datos(df)
 if df is None or df.empty:
     st.stop()
-
+ 
 # Detectar columna emisor
 col_emisor = obtener_col_emisor(df)
 if not col_emisor:
     st.error("❌ No se encontró columna de emisores en el Excel")
+    st.info("Columnas detectadas: " + ", ".join(df.columns.tolist()))
     st.stop()
-
+ 
 # ============================================================================
 # 🔧 PANEL DE FILTROS
 # ============================================================================
 st.markdown("")
-
+ 
 with st.expander("⚙️ **Filtros de Bonos y Resumen en Tiempo Real**", expanded=False):
     
     emisores_disponibles = sorted(df[col_emisor].unique())
@@ -443,23 +455,20 @@ with st.expander("⚙️ **Filtros de Bonos y Resumen en Tiempo Real**", expande
     
     with col_filter_1:
         emisores_seleccionados = st.multiselect(
-            "Selecciona los emisores a **INCLUIR** en las curvas:",
+            "Selecciona los emisores a **INCLUIR**:",
             options=emisores_disponibles,
             default=emisores_disponibles,
             help="Filtra los bonos por emisor"
         )
     
     with col_filter_2:
-        # Filtro de tipo de bono (opcional)
         tipos_disponibles = df['IG - HY'].unique()
         tipos_seleccionados = st.multiselect(
             "Tipo de Bono",
             options=tipos_disponibles,
             default=tipos_disponibles,
-            help="Investment Grade o High Yield"
         )
     
-    # Aplicar filtros
     df_filtrado = df[
         (df[col_emisor].isin(emisores_seleccionados)) &
         (df['IG - HY'].isin(tipos_seleccionados))
@@ -467,7 +476,6 @@ with st.expander("⚙️ **Filtros de Bonos y Resumen en Tiempo Real**", expande
     
     st.markdown("<hr style='margin: 15px 0; border: 0; border-top: 2px solid #E0E0E0;'>", unsafe_allow_html=True)
     
-    # Métricas en tiempo real
     m1, m2, m3, m4 = st.columns(4)
     
     with m1:
@@ -479,13 +487,9 @@ with st.expander("⚙️ **Filtros de Bonos y Resumen en Tiempo Real**", expande
     
     with m2:
         ytw_promedio = df_filtrado['YTW %'].mean() if not df_filtrado.empty else 0
-        ytw_anterior = df['YTW %'].mean() if not df.empty else 0
-        delta_ytw = ytw_promedio - ytw_anterior
         st.metric(
             label="📈 YTW Promedio",
-            value=f"{ytw_promedio:.2f}%",
-            delta=f"{delta_ytw:+.2f}% vs todos",
-            delta_color="inverse"
+            value=f"{ytw_promedio:.2f}%"
         )
     
     with m3:
@@ -502,47 +506,35 @@ with st.expander("⚙️ **Filtros de Bonos y Resumen en Tiempo Real**", expande
             label="📊 Distribución",
             value=f"IG: {ig_count} | HY: {hy_count}"
         )
-
+ 
 # ============================================================================
 # 📊 GRÁFICO Y PESTAÑAS
 # ============================================================================
 st.markdown("")
-
+ 
 fig = crear_grafico_interactivo(df_filtrado, col_emisor)
-
+ 
 tab1, tab2, tab3 = st.tabs(["📊 Gráfico Interactivo", "📋 Tabla de Datos", "⭐ Bonos Recomendados"])
-
+ 
 with tab1:
     st.plotly_chart(fig, theme=None, use_container_width=True)
-    
-    # Leyenda interactiva
     st.markdown("""
     **💡 Cómo interpretar el gráfico:**
-    - **Eje X**: Fecha de vencimiento del bono
-    - **Eje Y**: Rendimiento (YTW) en porcentaje
-    - **Líneas**: Tendencias polinómicas por tipo de bono
-    - **Puntos**: Cada bono individual
-    - **Colores**: Verde = IG (Investment Grade) | Rojo = HY (High Yield)
+    - **Eje X**: Fecha de vencimiento | **Eje Y**: Rendimiento (YTW)
+    - **Líneas**: Tendencias polinómicas | **Puntos**: Bonos individuales
+    - **Verde (IG)**: Investment Grade | **Rojo (HY)**: High Yield
     """)
-
+ 
 with tab2:
-    # Preparar configuración de columnas
     config_visual = {}
     
     if 'Maturity' in df_filtrado.columns:
         config_visual['Maturity'] = st.column_config.DateColumn(format="DD/MM/YYYY")
     
-    # Columnas de porcentaje
     for col in ['YTW %', 'Coupon %', 'Prev monthYTW%']:
         if col in df_filtrado.columns:
             config_visual[col] = st.column_config.NumberColumn(format="%.2f%%")
     
-    # Columnas de dinero
-    for col in ['Minimum Settlement', 'Outstanding US$']:
-        if col in df_filtrado.columns:
-            config_visual[col] = st.column_config.NumberColumn(format="$%.2f")
-    
-    # Mostrar tabla
     st.dataframe(
         df_filtrado.sort_values('Maturity'),
         use_container_width=True,
@@ -550,7 +542,6 @@ with tab2:
         height=600
     )
     
-    # Descargar datos
     csv = df_filtrado.to_csv(index=False)
     st.download_button(
         label="📥 Descargar como CSV",
@@ -558,12 +549,10 @@ with tab2:
         file_name="bonos_analisis.csv",
         mime="text/csv"
     )
-
+ 
 with tab3:
     st.subheader("⭐ Bonos Recomendados")
-    st.markdown("Análisis del equipo destacando activos con atractiva relación riesgo/retorno:")
     
-    # Buscar columna de recomendados
     col_recom = None
     for nombre_col in ['Recomendados', 'Recomendado', 'Recomendación', 'Recomend']:
         if nombre_col in df.columns:
@@ -580,24 +569,22 @@ with tab3:
             st.info("💡 No hay bonos recomendados en la selección actual.")
     else:
         st.warning("""
-        ⚠️ Para activar esta sección, agrega una columna en tu Excel llamada:
-        - **'Recomendados'** o **'Recomendado'**
-        
-        Luego completa con **'SI'** para los bonos que desees destacar.
+        ⚠️ Para activar esta sección, agrega una columna en tu Excel:
+        - **'Recomendados'** con valores 'SI' o 'NO'
         """)
-
+ 
 # ============================================================================
 # 📌 FOOTER
 # ============================================================================
 st.markdown("<hr style='margin: 40px 0; border: 0; border-top: 2px solid #E0E0E0;'>", unsafe_allow_html=True)
-
+ 
 col_footer_1, col_footer_2, col_footer_3 = st.columns([0.4, 0.3, 0.3])
-
+ 
 with col_footer_1:
-    st.caption(f"📅 **Datos actualizados:** Última carga hace menos de 5 minutos")
-
+    st.caption(f"📅 **Datos cargados correctamente**")
+ 
 with col_footer_2:
     st.caption(f"📊 **Total de registros:** {len(df)}")
-
+ 
 with col_footer_3:
     st.caption("🔄 Se actualiza automáticamente cada 5 minutos")
