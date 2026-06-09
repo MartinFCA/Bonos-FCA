@@ -130,7 +130,7 @@ try:
     st.error(f"❌ No se encontró el archivo '{NOMBRE_ARCHIVO_EXCEL}'")
     st.info("Asegúrate de que el archivo esté en la misma carpeta que el script.")
     st.stop()
-except Exception as e:
+    except Exception as e:
     st.error(f"❌ Error al cargar datos: {str(e)}")
     st.stop()
 
