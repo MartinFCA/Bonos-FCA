@@ -3,6 +3,8 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 import datetime
+import requests
+import io
 from urllib.error import URLError
 import warnings
 warnings.filterwarnings('ignore')
