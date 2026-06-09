@@ -434,9 +434,10 @@ with tab1:
     st.plotly_chart(fig, theme=None, use_container_width=True)
     st.markdown("""
     **💡 Cómo interpretar el gráfico:**
+    - **Filtrado**: Con cada filtración las curvas se actualizan automaticamente
     - **Eje X**: Fecha de vencimiento | **Eje Y**: Rendimiento (YTW)
     - **Líneas**: Tendencias polinómicas | **Puntos**: Bonos individuales
-    - **Verde (IG)**: Investment Grade | **Rojo (HY)**: High Yield
+    - **Celeste (IG)**: Investment Grade | **Naranja (HY)**: High Yield
     """)
 with tab2:
     config_visual = {}
