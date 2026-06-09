@@ -507,6 +507,6 @@ with col_footer_1:
  
 with col_footer_2:
     st.caption(f"📊 **Total de registros:** {len(df)}")
-    st.write(df_filtrado.columns.tolist())
+    
 
  
