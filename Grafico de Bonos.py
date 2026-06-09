@@ -304,20 +304,35 @@ def mostrar_bono_recomendado(row, col_emisor):
     fecha_txt = row['Maturity'].strftime('%d/%m/%Y') if isinstance(row['Maturity'], pd.Timestamp) else str(row['Maturity'])
     
     with st.container(border=True):
-        col1, col2 = st.columns([2, 1])
-        
+        # Header con Emisor y Rating
+        col1, col2 = st.columns([3, 1])
         with col1:
-            st.markdown(f"### 🏢 {row[col_emisor]} - {rating}")
-            st.caption(f"**{tipo_bono}**")
-        
+            st.markdown(f"### 🏢 {row[col_emisor]}")
         with col2:
+            st.markdown(f"<div style='background-color: {color_rating}; color: white; padding: 8px 12px; border-radius: 6px; text-align: center; font-weight: bold;'>{rating}</div>", unsafe_allow_html=True)
+        
+        # Tipo de bono
+        st.caption(f"{tipo_bono}")
+        
+        st.divider()
+        
+        # Métricas principales en columnas
+        m1, m2, m3, m4 = st.columns(4)
+        
+        with m1:
             st.metric("YTW", f"{row['YTW %']:.2f}%")
         
-        col_a, col_b, col_c = st.columns(3)
-        with col_a:
+        with m2:
             st.metric("Cupón", f"{row['Coupon %']:.2f}%")
-        with col_b:
+        
+        with m3:
             st.metric("Vencimiento", fecha_txt)
+        
+        with m4:
+            # Aquí puedes agregar más campos, por ejemplo:
+            if 'Prev monthYTW%' in row.index and pd.notna(row['Prev monthYTW%']):
+                dif = row['YTW %'] - row['Prev monthYTW%']
+                st.metric("Cambio YTW", f"{dif:+.2f}%")
  
 # ============================================================================
 # 📊 TÍTULO Y HEADER
