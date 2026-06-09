@@ -438,7 +438,6 @@ with tab1:
     - **Líneas**: Tendencias polinómicas | **Puntos**: Bonos individuales
     - **Verde (IG)**: Investment Grade | **Rojo (HY)**: High Yield
     """)
- 
 with tab2:
     config_visual = {}
     
@@ -448,30 +447,30 @@ with tab2:
     for col in ['YTW %', 'Coupon %', 'YTW% t-15']:
         if col in df_filtrado.columns:
             config_visual[col] = st.column_config.NumberColumn(format="%.2f%%")
-
     for col in ['Minimum Settlement', 'Outstanding US$']:
         if col in df_filtrado.columns:
             config_visual[col] = st.column_config.NumberColumn(format="$%.0f")
-
     for col in ['Price']:
         if col in df_filtrado.columns:
             config_visual[col] = st.column_config.NumberColumn(format="$%.2f")
     
+    # Eliminar columna Recomendados
+    df_mostrar = df_filtrado.drop(columns=['Recomendados'], errors='ignore')
+    
     st.dataframe(
-        df_filtrado.sort_values('Maturity'),
+        df_mostrar.sort_values('Maturity'),
         use_container_width=True,
         column_config=config_visual,
         height=600
     )
     
-    csv = df_filtrado.to_csv(index=False)
+    csv = df_mostrar.to_csv(index=False)
     st.download_button(
         label="📥 Descargar como CSV",
         data=csv,
         file_name="bonos_analisis.csv",
         mime="text/csv"
     )
- 
 with tab3:
     st.subheader("⭐ Bonos Recomendados")
     
