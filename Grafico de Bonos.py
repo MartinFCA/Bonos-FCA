@@ -92,7 +92,7 @@ try:
     
     df = df.dropna(subset=['Maturity', 'YTW %'])
     
-    columnas_porcentaje = ['YTW %', 'Coupon %', 'YTW t-15']
+    columnas_porcentaje = ['YTW %', 'Coupon %', 'YTW% t-15']
     for col in columnas_porcentaje:
         if col in df.columns and df[col].max() <= 1.0:
             df[col] = df[col] * 100
@@ -445,7 +445,7 @@ with tab2:
     if 'Maturity' in df_filtrado.columns:
         config_visual['Maturity'] = st.column_config.DateColumn(format="DD/MM/YYYY")
     
-    for col in ['YTW %', 'Coupon %', 'YTW t-15']:
+    for col in ['YTW %', 'Coupon %', 'YTW% t-15']:
         if col in df_filtrado.columns:
             config_visual[col] = st.column_config.NumberColumn(format="%.2f%%")
 
