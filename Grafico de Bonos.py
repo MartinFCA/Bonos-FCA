@@ -14,8 +14,17 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="collapsed",
     menu_items=None,
-    theme="dark"
 )
+# Forzar modo oscuro con CSS
+dark_mode_css = """
+<style>
+    [data-testid="stAppViewContainer"] {
+        background-color: #111;
+        color: #fff;
+    }
+</style>
+"""
+st.markdown(dark_mode_css, unsafe_allow_html=True)
 
 warnings.filterwarnings('ignore')
 
