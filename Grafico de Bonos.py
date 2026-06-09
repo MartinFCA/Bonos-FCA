@@ -47,28 +47,21 @@ ocultar_estilos = """
     footer {visibility: hidden;}
     header {visibility: hidden;}
     
-    /* Métricas centradas */
     div[data-testid="stMetric"] {text-align: center;}
     div[data-testid="stMetricValue"] {font-size: 28px; font-weight: bold;}
     div[data-testid="stMetricLabel"] {font-size: 12px; text-transform: uppercase; color: #666;}
     
-    /* Tabs mejoradas */
+    /* FIX: Hacer visibles los labels de las tabs */
     button[data-baseweb="tab"] {
         background: linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%);
         border-radius: 8px 8px 0 0;
+        color: #222 !important;
+        font-weight: 500 !important;
     }
     
-    /* Scrollbar personalizado */
     ::-webkit-scrollbar {width: 8px;}
     ::-webkit-scrollbar-track {background: #f1f1f1;}
     ::-webkit-scrollbar-thumb {background: #888; border-radius: 4px;}
-    
-    /* Expanders mejorados */
-    div[data-testid="stExpander"] {
-        border: 1px solid #E0E0E0;
-        border-radius: 8px;
-        background: linear-gradient(135deg, #FAFAFA 0%, #FFFFFF 100%);
-    }
 </style>
 """
 st.markdown(ocultar_estilos, unsafe_allow_html=True)
@@ -310,58 +303,21 @@ def mostrar_bono_recomendado(row, col_emisor):
     tipo_bono = "Investment Grade (IG)" if row['IG - HY'] == 'IG' else "High Yield (HY)"
     fecha_txt = row['Maturity'].strftime('%d/%m/%Y') if isinstance(row['Maturity'], pd.Timestamp) else str(row['Maturity'])
     
-    html_card = f"""
-    <div style="
-        border-left: 6px solid {color_rating};
-        padding: 18px;
-        border-radius: 10px;
-        background: linear-gradient(135deg, #FAFAFA 0%, #FFFFFF 100%);
-        margin: 12px 0;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        border: 1px solid #E8E8E8;
-    ">
-        <h3 style="margin: 0 0 12px 0; color: #222; display: flex; align-items: center;">
-            🏢 {row[col_emisor]}
-            <span style="
-                display: inline-block;
-                background-color: {color_rating};
-                color: white;
-                padding: 4px 12px;
-                border-radius: 20px;
-                font-size: 12px;
-                font-weight: bold;
-                margin-left: 10px;
-            ">{rating}</span>
-        </h3>
+    with st.container(border=True):
+        col1, col2 = st.columns([2, 1])
         
-        <p style="margin: 8px 0; color: #666; font-size: 13px;">
-            <b>Categoría:</b> {tipo_bono}
-        </p>
+        with col1:
+            st.markdown(f"### 🏢 {row[col_emisor]} - {rating}")
+            st.caption(f"**{tipo_bono}**")
         
-        <div style="
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 12px;
-            margin-top: 12px;
-            padding-top: 12px;
-            border-top: 1px solid #E0E0E0;
-        ">
-            <div style="text-align: center;">
-                <div style="font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 0.5px;">Rendimiento</div>
-                <div style="font-size: 18px; font-weight: bold; color: {color_rating};">{row['YTW %']:.2f}%</div>
-            </div>
-            <div style="text-align: center;">
-                <div style="font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 0.5px;">Cupón</div>
-                <div style="font-size: 18px; font-weight: bold; color: #222;">{row['Coupon %']:.2f}%</div>
-            </div>
-            <div style="text-align: center;">
-                <div style="font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 0.5px;">Vencimiento</div>
-                <div style="font-size: 16px; font-weight: bold; color: #222;">{fecha_txt}</div>
-            </div>
-        </div>
-    </div>
-    """
-    st.markdown(html_card, unsafe_allow_html=True)
+        with col2:
+            st.metric("YTW", f"{row['YTW %']:.2f}%")
+        
+        col_a, col_b, col_c = st.columns(3)
+        with col_a:
+            st.metric("Cupón", f"{row['Coupon %']:.2f}%")
+        with col_b:
+            st.metric("Vencimiento", fecha_txt)
  
 # ============================================================================
 # 📊 TÍTULO Y HEADER
