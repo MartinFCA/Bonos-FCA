@@ -347,20 +347,21 @@ def mostrar_bono_recomendado(row, col_emisor):
             if 'Prev monthYTW%' in row.index and pd.notna(row['Prev monthYTW%']):
                 dif = row['YTW %'] - row['Prev monthYTW%']
                 st.metric("Cambio YTW", f"{dif:+.2f}%")
+ #Funcion para mostrar la tabla de Etf's#               
 def mostrar_tabla_etf():
-        """Muestra tabla de ETFs de renta fija"""
-        df_etf = pd.read_excel("ETF.xlsx")
-        
-        config_etf = {}
-        
-        for col in ['TER', 'YTW']:
-            if col in df_etf.columns:
-                config_etf[col] = st.column_config.NumberColumn(format="%.2f%%")
-        
-        if 'Link' in df_etf.columns:
-            config_etf['Link'] = st.column_config.LinkColumn(
-                display_text="Ver producto"
-            )
+    """Muestra tabla de ETFs de renta fija"""
+    df_etf = pd.read_excel("ETF.xlsx")
+    
+    config_etf = {}
+    
+    for col in ['TER', 'YTW']:
+        if col in df_etf.columns:
+            config_etf[col] = st.column_config.NumberColumn(format="%.2f%%")
+    
+    if 'Link' in df_etf.columns:
+        config_etf['Link'] = st.column_config.LinkColumn(
+            display_text="Ver producto"
+        )
     
     st.dataframe(
         df_etf,
@@ -376,7 +377,6 @@ def mostrar_tabla_etf():
         file_name="etf_analisis.csv",
         mime="text/csv"
     )
- 
 # ============================================================================
 # 📊 TÍTULO Y HEADER
 # ============================================================================
