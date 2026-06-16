@@ -357,7 +357,7 @@ def mostrar_tabla_etf():
 #Volver a Porcentaje los numeros de excel
     col_porcentaje = ['TER', 'YTW']
     for col in col_porcentaje:
-            if col in df_etf.columns and df_etf[col].max() <= 1.0=
+            if col in df_etf.columns and df_etf[col].max() <= 1.0:
                 df_etf[col] = df_etf[col]*100
     
     config_etf = {}
