@@ -347,10 +347,18 @@ def mostrar_bono_recomendado(row, col_emisor):
             if 'Prev monthYTW%' in row.index and pd.notna(row['Prev monthYTW%']):
                 dif = row['YTW %'] - row['Prev monthYTW%']
                 st.metric("Cambio YTW", f"{dif:+.2f}%")
- #Funcion para mostrar la tabla de Etf's#               
+
+
+    
+#Funcion para mostrar la tabla de Etf's#               
 def mostrar_tabla_etf():
     """Muestra tabla de ETFs de renta fija"""
     df_etf = pd.read_excel("ETF.xlsx")
+#Volver a Porcentaje los numeros de excel
+    col_porcentaje = ['TER', 'YTW']
+    for col in col_porcentaje:
+            if col in df_etf.columns and df_etf[col].max() <= 1.0=
+                df_etf[col] = df_etf[col]*100
     
     config_etf = {}
     
