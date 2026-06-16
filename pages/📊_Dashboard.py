@@ -375,7 +375,7 @@ def mostrar_tabla_etf():
         df_etf,
         use_container_width=True,
         column_config=config_etf,
-        height=600
+        height= None
     )
     
     csv_etf = df_etf.to_csv(index=False)
