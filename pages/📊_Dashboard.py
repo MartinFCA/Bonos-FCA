@@ -347,6 +347,35 @@ def mostrar_bono_recomendado(row, col_emisor):
             if 'Prev monthYTW%' in row.index and pd.notna(row['Prev monthYTW%']):
                 dif = row['YTW %'] - row['Prev monthYTW%']
                 st.metric("Cambio YTW", f"{dif:+.2f}%")
+    def mostrar_tabla_etf():
+        """Muestra tabla de ETFs de renta fija"""
+        df_etf = pd.read_excel("ETF.xlsx")
+        
+        config_etf = {}
+        
+        for col in ['TER', 'YTW']:
+            if col in df_etf.columns:
+                config_etf[col] = st.column_config.NumberColumn(format="%.2f%%")
+        
+        if 'Link' in df_etf.columns:
+            config_etf['Link'] = st.column_config.LinkColumn(
+                display_text="Ver producto"
+            )
+        
+        st.dataframe(
+            df_etf,
+            use_container_width=True,
+            column_config=config_etf,
+            height=600
+        )
+        
+        csv_etf = df_etf.to_csv(index=False)
+        st.download_button(
+            label="📥 Descargar ETFs como CSV",
+            data=csv_etf,
+            file_name="etf_analisis.csv",
+            mime="text/csv"
+        )
  
 # ============================================================================
 # 📊 TÍTULO Y HEADER
@@ -441,7 +470,7 @@ st.markdown("")
  
 fig = crear_grafico_interactivo(df_filtrado, col_emisor)
  
-tab1, tab2, tab3 = st.tabs(["📊 Gráfico Interactivo", "📋 Tabla de Datos", "⭐ Bonos Recomendados"])
+tab1, tab2, tab3, tab4 = st.tabs(["📊 Gráfico Interactivo", "📋 Tabla de Datos", "⭐ Bonos Recomendados", "📊 ETF's"])
  
 with tab1:
     st.plotly_chart(fig, theme=None, use_container_width=True)
@@ -507,6 +536,9 @@ with tab3:
         ⚠️ Para activar esta sección, agrega una columna en tu Excel:
         - **'Recomendados'** con valores 'SI' o 'NO'
         """)
+with tab4:
+    st.subheader("📊 ETFs de Renta Fija")
+    mostrar_tabla_etf()
  
 # ============================================================================
 # 📌 FOOTER
