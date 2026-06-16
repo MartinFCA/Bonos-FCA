@@ -370,12 +370,15 @@ def mostrar_tabla_etf():
         config_etf['Link'] = st.column_config.LinkColumn(
             display_text="Ver producto"
         )
+        
+    #Cantidad de Filas que tenemos para solo mostrar el limite
     
+    altura = min(600, len(df_etf) * 35 + 50)
     st.dataframe(
         df_etf,
         use_container_width=True,
         column_config=config_etf,
-        height= None
+        height=altura
     )
     
     csv_etf = df_etf.to_csv(index=False)
