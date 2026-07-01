@@ -8,4 +8,4 @@ st.caption("Perspectivas de inversión y manejo de carteras")
 with open("FCA_Market_Views_Junio2026_5.html", "r", encoding="utf-8") as f:
     html_content = f.read()
 
-st.components.v1.html(html_content, height=1000, scrolling=True)
+st.components.v1.html(html_content, height=1300, scrolling=True)
