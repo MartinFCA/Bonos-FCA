@@ -10,6 +10,6 @@ st.markdown("""
 
 Accede a través del menú lateral:
 - **Dashboard**: Análisis de bonos en tiempo real
-- **Market Views**: Perspectivas de inversión
+- **Estrategia de Cartera**: Perspectivas de inversión
 - **Recursos**: Documentación y reportes
 """)
