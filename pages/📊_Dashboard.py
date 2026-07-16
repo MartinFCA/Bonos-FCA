@@ -488,7 +488,7 @@ st.markdown("")
  
 fig = crear_grafico_interactivo(df_filtrado, col_emisor)
  
-tab1, tab2, tab3, tab4 = st.tabs(["📊 Gráfico Interactivo", "📋 Tabla de Datos", "⭐ Bonos Recomendados", "📊 ETF's"])
+tab1, tab2, tab3, tab4 = st.tabs(["📊 Gráfico Interactivo", "📋 Tabla de Datos", "⚖️ Decisión de Bonos", "📊 ETF's"])
  
 with tab1:
     st.plotly_chart(fig, theme=None, use_container_width=True)
