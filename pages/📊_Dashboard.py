@@ -312,6 +312,11 @@ def crear_grafico_interactivo(df_filtrado, col_emisor):
  
 def mostrar_bono_recomendado(row, col_emisor):
     """Muestra una tarjeta mejorada de bono recomendado"""
+    decision = None
+    for nombre_col in ['Recomendados', 'Recomendado', 'Recomendación', 'Recomend', 'Decisión']:
+        if nombre_col in df.columns:
+            decision = nombre_col
+            break
     rating = str(row['Rating'])
     color_rating = RATING_COLORS.get(rating, '#999')
     tipo_bono = "Investment Grade (IG)" if row['IG - HY'] == 'IG' else "High Yield (HY)"
@@ -331,7 +336,7 @@ def mostrar_bono_recomendado(row, col_emisor):
         st.divider()
         
         # Métricas principales en columnas
-        m1, m2, m3, m4 = st.columns(4)
+        m1, m2, m3, m4, m5 = st.columns(5)
         
         with m1:
             st.metric("YTW", f"{row['YTW %']:.2f}%")
@@ -347,6 +352,8 @@ def mostrar_bono_recomendado(row, col_emisor):
             if 'Prev monthYTW%' in row.index and pd.notna(row['Prev monthYTW%']):
                 dif = row['YTW %'] - row['Prev monthYTW%']
                 st.metric("Cambio YTW", f"{dif:+.2f}%")
+        with m5:
+            st.metric("Decisión", decision)
 
 
     
@@ -526,16 +533,14 @@ with tab2:
         mime="text/csv"
     )
 with tab3:
-    st.subheader("⭐ Bonos Recomendados")
+    st.subheader("⚖️Decisión de Bonos")
     
     col_recom = None
-    for nombre_col in ['Recomendados', 'Recomendado', 'Recomendación', 'Recomend']:
+    for nombre_col in ['Recomendados', 'Recomendado', 'Recomendación', 'Recomend', 'Decisión']:
         if nombre_col in df.columns:
             col_recom = nombre_col
             break
-    
-    if col_recom:
-        df_recom = df_filtrado[df_filtrado[col_recom].astype(str).str.upper() == 'SI']
+        df_recom = col_recom
         
         if not df_recom.empty:
             for idx, row in df_recom.iterrows():
