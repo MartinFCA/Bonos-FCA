@@ -134,7 +134,18 @@ class BondRepository:
             st.stop()
 
         self.col_decision = self._detectar_col_decision(df)
+
+        # Se excluyen los bonos marcados como 'Done' en la columna de decisión:
+        # "Done" indica que la empresa ya no es rentable para pagar sus deudas,
+        # por lo que no deben mostrarse ni en tablas ni en gráficos del dashboard.
+        self.df = self._excluir_decision_done(self.df, self.col_decision)
         return self
+
+    @staticmethod
+    def _excluir_decision_done(df, col_decision):
+        if not col_decision:
+            return df
+        return df[df[col_decision].astype(str).str.strip() != 'Done']
 
     def _validar_y_preparar(self, df):
         faltantes = [col for col in self.COLUMNAS_REQUERIDAS if col not in df.columns]
