@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FCA Asset Management — Market Views & Carteras Modelo · Junio 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Source Sans 3', 'Segoe UI', sans-serif;
+    background: #f0f2f5;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 32px 16px;
+  }
+
+  .page {
+    background: #ffffff;
+    width: 900px;
+    max-width: 100%;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  /* HEADER */
+  .fca-header {
+    background: #1C2B4A;
+    padding: 20px 28px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo-top {
+    font-size: 30px;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: 0.05em;
+    line-height: 1;
+  }
+  .logo-bot {
+    font-size: 9px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: #C9A84C;
+    font-weight: 400;
+    margin-top: 3px;
+    display: block;
+  }
+  .header-right { text-align: right; }
+  .doc-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #ffffff;
+    letter-spacing: 0.03em;
+    margin-bottom: 4px;
+  }
+  .doc-date {
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #C9A84C;
+  }
+
+  .gold-bar { height: 3px; background: #C9A84C; }
+
+  /* BODY */
+  .body { padding: 22px 28px 24px; }
+
+  .sec-label {
+    font-size: 9.5px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #C9A84C;
+    font-weight: 700;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .sec-label::after {
+    content: '';
+    flex: 1;
+    height: 0.5px;
+    background: #C9A84C;
+    opacity: 0.35;
+  }
+
+  /* ASSET CLASS VIEWS */
+  .views-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 0;
+  }
+  .view-card {
+    background: #f7f8fa;
+    border: 0.5px solid #dde1ea;
+    border-top: 3px solid #1C2B4A;
+    border-radius: 3px;
+    padding: 12px 15px;
+  }
+  .view-cat {
+    font-size: 10px;
+    color: #8a93a6;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+  }
+  .view-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1C2B4A;
+    margin-bottom: 10px;
+  }
+
+  /* BADGES */
+  .badge {
+    display: inline-block;
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 3px 11px;
+    border-radius: 2px;
+    text-transform: uppercase;
+  }
+  .badge-ow  { background: #e8f5f0; color: #1a6b4a; border: 0.5px solid #1a6b4a; }
+  .badge-uw  { background: #fdf0e8; color: #b85c1a; border: 0.5px solid #b85c1a; }
+  .badge-neu { background: #f0f1f5; color: #4a5570; border: 0.5px solid #8a93a6; }
+
+  .divider { border: none; border-top: 0.5px solid #dde1ea; margin: 18px 0; }
+
+  /* SUB-ASSET VIEWS */
+  .sub-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .sub-group-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #1C2B4A;
+    margin-bottom: 8px;
+    padding-bottom: 5px;
+    border-bottom: 1.5px solid #C9A84C;
+  }
+  .sub-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 7px 0;
+    border-bottom: 0.5px solid #edf0f5;
+  }
+  .sub-row:last-child { border-bottom: none; }
+  .sub-name { font-size: 12.5px; color: #3a4560; }
+
+  /* PORTFOLIOS */
+  .port-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  .port-card {
+    border: 0.5px solid #dde1ea;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .port-header {
+    background: #1C2B4A;
+    padding: 11px 14px 10px;
+  }
+  .port-profile {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #C9A84C;
+    margin-bottom: 2px;
+  }
+  .port-tagline {
+    font-size: 10.5px;
+    color: rgba(255,255,255,0.55);
+  }
+  .port-body { padding: 13px 14px; }
+
+  .alloc-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+  }
+  .alloc-left { display: flex; align-items: center; gap: 7px; }
+  .alloc-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .alloc-lbl { font-size: 12px; color: #3a4560; }
+  .alloc-val { font-size: 12px; font-weight: 700; color: #1C2B4A; }
+
+  /* BAR */
+  .bar-wrap {
+    display: flex;
+    height: 6px;
+    border-radius: 3px;
+    overflow: hidden;
+    margin: 10px 0 13px;
+    background: #edf0f5;
+  }
+  .bar-fi  { background: #1C2B4A; }
+  .bar-eq  { background: #C9A84C; }
+  .bar-alt { background: #8a93a6; }
+
+  /* BREAKDOWN */
+  .bd-label {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: #C9A84C;
+    margin-bottom: 5px;
+    padding-bottom: 3px;
+    border-bottom: 1px solid #edf0f5;
+  }
+  .bd-rows {
+    padding-left: 9px;
+    border-left: 2px solid #edf0f5;
+    margin-bottom: 10px;
+  }
+  .bd-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 3px 0;
+  }
+  .bd-name { font-size: 11px; color: #5a6580; }
+  .bd-val  { font-size: 11px; font-weight: 700; color: #1C2B4A; }
+
+  /* FOOTER */
+  .fca-footer {
+    background: #1C2B4A;
+    padding: 10px 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .footer-left-txt { font-size: 10px; color: rgba(255,255,255,0.45); }
+  .footer-url { font-size: 10px; color: #C9A84C; margin-top: 1px; }
+  .legend { display: flex; gap: 16px; }
+  .leg-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: rgba(255,255,255,0.5); }
+  .leg-dot { width: 7px; height: 7px; border-radius: 50%; }
+
+  @media print {
+    body { background: #fff; padding: 0; }
+    .page { box-shadow: none; width: 100%; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="fca-header">
+    <div>
+      <div class="logo-top">FCA</div>
+      <span class="logo-bot">Asset Management</span>
+    </div>
+    <div class="header-right">
+      <div class="doc-title">Market Views &amp; Carteras Modelo</div>
+      <div class="doc-date">Junio 2026</div>
+    </div>
+  </div>
+  <div class="gold-bar"></div>
+
+  <div class="body">
+
+    <!-- ASSET CLASS VIEWS -->
+    <div class="sec-label">Posicionamiento estratégico — Asset classes</div>
+    <div class="views-grid">
+      <div class="view-card">
+        <div class="view-cat">Asset class</div>
+        <div class="view-name">Equities</div>
+        <span class="badge badge-uw">Underweight</span>
+      </div>
+      <div class="view-card">
+        <div class="view-cat">Asset class</div>
+        <div class="view-name">Fixed Income</div>
+        <span class="badge badge-neu">Neutral</span>
+      </div>
+      <div class="view-card">
+        <div class="view-cat">Asset class</div>
+        <div class="view-name">Cash</div>
+        <span class="badge badge-ow">Overweight</span>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- SUB-ASSET VIEWS -->
+    <div class="sec-label">Sub-asset class views</div>
+    <div class="sub-grid">
+      <div>
+        <div class="sub-group-label">Equities</div>
+        <div class="sub-row"><span class="sub-name">US</span><span class="badge badge-uw">Underweight</span></div>
+        <div class="sub-row"><span class="sub-name">EAFE</span><span class="badge badge-neu">Neutral</span></div>
+        <div class="sub-row"><span class="sub-name">Emerging Markets</span><span class="badge badge-ow">Overweight</span></div>
+      </div>
+      <div>
+        <div class="sub-group-label">Fixed Income</div>
+        <div class="sub-row"><span class="sub-name">Treasuries</span><span class="badge badge-uw">Underweight</span></div>
+        <div class="sub-row"><span class="sub-name">TIPS</span><span class="badge badge-neu">Neutral</span></div>
+        <div class="sub-row"><span class="sub-name">IG Credit</span><span class="badge badge-ow">Overweight</span></div>
+        <div class="sub-row"><span class="sub-name">EM Bonds</span><span class="badge badge-ow">Overweight</span></div>
+        <div class="sub-row"><span class="sub-name">High Yield</span><span class="badge badge-neu">Neutral</span></div>
+        <div class="sub-row"><span class="sub-name">Duration</span><span class="badge badge-neu">Neutral</span></div>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- PORTFOLIOS -->
+    <div class="sec-label">Carteras modelo — Allocations estratégicas</div>
+    <div class="port-grid">
+
+      <!-- CONSERVADOR -->
+      <div class="port-card">
+        <div class="port-header">
+          <div class="port-profile">Conservador</div>
+          <div class="port-tagline">Capital preservation · Income</div>
+        </div>
+        <div class="port-body">
+          <div class="alloc-row"><div class="alloc-left"><div class="alloc-dot" style="background:#1C2B4A;"></div><span class="alloc-lbl">Fixed Income</span></div><span class="alloc-val">80%</span></div>
+          <div class="alloc-row"><div class="alloc-left"><div class="alloc-dot" style="background:#C9A84C;"></div><span class="alloc-lbl">Equity</span></div><span class="alloc-val">20%</span></div>
+          <div class="alloc-row"><div class="alloc-left"><div class="alloc-dot" style="background:#8a93a6;"></div><span class="alloc-lbl">Alternatives</span></div><span class="alloc-val">—</span></div>
+          <div class="bar-wrap">
+            <div class="bar-fi" style="width:80%;"></div>
+            <div class="bar-eq" style="width:20%;"></div>
+          </div>
+          <div class="bd-label">Fixed Income — 80%</div>
+          <div class="bd-rows">
+            <div class="bd-row"><span class="bd-name">US Treasury</span><span class="bd-val">10%</span></div>
+            <div class="bd-row"><span class="bd-name">TIPS</span><span class="bd-val">10%</span></div>
+            <div class="bd-row"><span class="bd-name">IG Corporate</span><span class="bd-val">35%</span></div>
+            <div class="bd-row"><span class="bd-name">EM Bonds</span><span class="bd-val">12.5%</span></div>
+            <div class="bd-row"><span class="bd-name">High Yield</span><span class="bd-val">12.5%</span></div>
+          </div>
+          <div class="bd-label">Equity — 20%</div>
+          <div class="bd-rows">
+            <div class="bd-row"><span class="bd-name">US Equity</span><span class="bd-val">10%</span></div>
+            <div class="bd-row"><span class="bd-name">Intl Dev (EAFE)</span><span class="bd-val">5%</span></div>
+            <div class="bd-row"><span class="bd-name">EM Equity</span><span class="bd-val">5%</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODERADO -->
+      <div class="port-card">
+        <div class="port-header" style="border-bottom: 2.5px solid #C9A84C;">
+          <div class="port-profile">Moderado</div>
+          <div class="port-tagline">Income + growth balance</div>
+        </div>
+        <div class="port-body">
+          <div class="alloc-row"><div class="alloc-left"><div class="alloc-dot" style="background:#1C2B4A;"></div><span class="alloc-lbl">Fixed Income</span></div><span class="alloc-val">60%</span></div>
+          <div class="alloc-row"><div class="alloc-left"><div class="alloc-dot" style="background:#C9A84C;"></div><span class="alloc-lbl">Equity</span></div><span class="alloc-val">34%</span></div>
+          <div class="alloc-row"><div class="alloc-left"><div class="alloc-dot" style="background:#8a93a6;"></div><span class="alloc-lbl">Alternatives</span></div><span class="alloc-val">6%</span></div>
+          <div class="bar-wrap">
+            <div class="bar-fi" style="width:60%;"></div>
+            <div class="bar-eq" style="width:34%;"></div>
+            <div class="bar-alt" style="width:6%;"></div>
+          </div>
+          <div class="bd-label">Fixed Income — 60%</div>
+          <div class="bd-rows">
+            <div class="bd-row"><span class="bd-name">US Treasury</span><span class="bd-val">5%</span></div>
+            <div class="bd-row"><span class="bd-name">TIPS</span><span class="bd-val">5%</span></div>
+            <div class="bd-row"><span class="bd-name">IG Corporate</span><span class="bd-val">25%</span></div>
+            <div class="bd-row"><span class="bd-name">EM Bonds</span><span class="bd-val">12.5%</span></div>
+            <div class="bd-row"><span class="bd-name">High Yield</span><span class="bd-val">12.5%</span></div>
+          </div>
+          <div class="bd-label">Equity — 34%</div>
+          <div class="bd-rows">
+            <div class="bd-row"><span class="bd-name">US Equity</span><span class="bd-val">16%</span></div>
+            <div class="bd-row"><span class="bd-name">Intl Dev (EAFE)</span><span class="bd-val">9%</span></div>
+            <div class="bd-row"><span class="bd-name">EM Equity</span><span class="bd-val">9%</span></div>
+          </div>
+          <div class="bd-label">Alternatives — 6%</div>
+          <div class="bd-rows">
+            <div class="bd-row"><span class="bd-name">Real Estate</span><span class="bd-val">2%</span></div>
+            <div class="bd-row"><span class="bd-name">Infrastructure</span><span class="bd-val">2%</span></div>
+            <div class="bd-row"><span class="bd-name">Commodities</span><span class="bd-val">2%</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AGRESIVO -->
+      <div class="port-card">
+        <div class="port-header">
+          <div class="port-profile">Agresivo</div>
+          <div class="port-tagline">Growth · Long-term horizon</div>
+        </div>
+        <div class="port-body">
+          <div class="alloc-row"><div class="alloc-left"><div class="alloc-dot" style="background:#1C2B4A;"></div><span class="alloc-lbl">Fixed Income</span></div><span class="alloc-val">35%</span></div>
+          <div class="alloc-row"><div class="alloc-left"><div class="alloc-dot" style="background:#C9A84C;"></div><span class="alloc-lbl">Equity</span></div><span class="alloc-val">56%</span></div>
+          <div class="alloc-row"><div class="alloc-left"><div class="alloc-dot" style="background:#8a93a6;"></div><span class="alloc-lbl">Alternatives</span></div><span class="alloc-val">9%</span></div>
+          <div class="bar-wrap">
+            <div class="bar-fi" style="width:35%;"></div>
+            <div class="bar-eq" style="width:56%;"></div>
+            <div class="bar-alt" style="width:9%;"></div>
+          </div>
+          <div class="bd-label">Fixed Income — 35%</div>
+          <div class="bd-rows">
+            <div class="bd-row"><span class="bd-name">US Treasury</span><span class="bd-val">5%</span></div>
+            <div class="bd-row"><span class="bd-name">TIPS</span><span class="bd-val">5%</span></div>
+            <div class="bd-row"><span class="bd-name">IG Corporate</span><span class="bd-val">10%</span></div>
+            <div class="bd-row"><span class="bd-name">EM Bonds</span><span class="bd-val">7.5%</span></div>
+            <div class="bd-row"><span class="bd-name">High Yield</span><span class="bd-val">7.5%</span></div>
+          </div>
+          <div class="bd-label">Equity — 56%</div>
+          <div class="bd-rows">
+            <div class="bd-row"><span class="bd-name">US Equity</span><span class="bd-val">30%</span></div>
+            <div class="bd-row"><span class="bd-name">Intl Dev (EAFE)</span><span class="bd-val">13%</span></div>
+            <div class="bd-row"><span class="bd-name">EM Equity</span><span class="bd-val">13%</span></div>
+          </div>
+          <div class="bd-label">Alternatives — 9%</div>
+          <div class="bd-rows">
+            <div class="bd-row"><span class="bd-name">Real Estate</span><span class="bd-val">3%</span></div>
+            <div class="bd-row"><span class="bd-name">Infrastructure</span><span class="bd-val">3%</span></div>
+            <div class="bd-row"><span class="bd-name">Commodities</span><span class="bd-val">3%</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="gold-bar"></div>
+  <div class="fca-footer">
+    <div>
+      <div class="footer-left-txt">FCA Asset Management · Argentina</div>
+      <div class="footer-url">fcaassetmanagement.com</div>
+    </div>
+    <div class="legend">
+      <div class="leg-item"><div class="leg-dot" style="background:#1C2B4A; border:1px solid rgba(255,255,255,0.3);"></div>Fixed Income</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#C9A84C;"></div>Equity</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#8a93a6;"></div>Alternatives</div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
