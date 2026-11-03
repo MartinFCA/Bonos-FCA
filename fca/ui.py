@@ -17,7 +17,7 @@ _CSS = f"""
 <style>
 
 #MainMenu, footer, [data-testid="stDecoration"] {{ display: none; }}
-.block-container {{ padding-top: 4.5rem; padding-bottom: 3rem; max-width: 1280px; }}
+.block-container {{ padding-top: 4.5rem; padding-bottom: 3rem; max-width: 1680px; padding-left: 2.5rem; padding-right: 2.5rem; }}
 
 .fca-header {{
   background: {B['navy']}; border-radius: 6px; overflow: hidden; margin-bottom: 1.25rem;
