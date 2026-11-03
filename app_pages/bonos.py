@@ -16,7 +16,7 @@ except DataError as e:
 df = universo.df
 
 # ── Filtros ──────────────────────────────────────────────────────────────────
-f1, f2, f3, f4 = st.columns([1, 1, 2, 1.4])
+f1, f2, f3, f4 = st.columns([1.6, 1.6, 2, 1.4], gap="large")
 segmentos = f1.pills(
     "Segmento", options=sorted(df["segment"].dropna().unique()), selection_mode="multi",
     default=sorted(df["segment"].dropna().unique()), format_func=lambda s: SEGMENT_LABELS.get(s, s),
