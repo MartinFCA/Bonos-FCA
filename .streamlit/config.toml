@@ -1,0 +1,25 @@
+[server]
+enableXsrfProtection = true
+enableCORS = true
+maxUploadSize = 10
+runOnSave = false
+
+[browser]
+gatherUsageStats = false
+
+[client]
+showErrorDetails = "none"
+toolbarMode = "minimal"
+
+[runner]
+fastReruns = true
+
+[theme]
+base = "light"
+primaryColor = "#1C2B4A"
+backgroundColor = "#F5F6F8"
+secondaryBackgroundColor = "#FFFFFF"
+textColor = "#1A1F2B"
+borderColor = "#DDE1EA"
+baseRadius = "small"
+chartCategoricalColors = ["#2E5C9A", "#C9A84C", "#1E8E5A", "#B5473A", "#6B7489"]
