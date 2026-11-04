@@ -33,5 +33,5 @@ SEGMENT_COLORS = {"IG": "#2E5C9A", "HY": "#C9A84C"}
 SEGMENT_LABELS = {"IG": "Investment Grade", "HY": "High Yield"}
 
 # Buy = comprar, Hold = mantener, Done = cerrado (se excluye del dashboard).
-DECISION_COLORS = {"Buy": "#1E8E5A", "Hold": "#C99A2E", "Done": "#8A93A6"}
+DECISION_COLORS = {"Buy": "#1E8E5A", "Hold": "#C99A2E", "Done": "#8A93A6", "Sell": "#FF2C2C"}
 DECISION_EXCLUIDA = "Done"
